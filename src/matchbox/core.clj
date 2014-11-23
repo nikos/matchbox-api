@@ -11,13 +11,28 @@
 (defn find-similar-users
   "For n users find the k most similar."
   [n k]
-  (let [model (FileDataModel. (File. "test/data/users-interests.csv"))
+  (let [model (FileDataModel. (File. "test/data/simple-interests.csv"))
         similarity (PearsonCorrelationSimilarity. model)
         neighborhood (NearestNUserNeighborhood. 2 similarity model)
-        recommender  (GenericUserBasedRecommender. model neighborhood
-                                                   similarity)]
+        recommender (GenericUserBasedRecommender. model neighborhood similarity)]
+
+    (println "================")
     (doseq [user-id (range n)]
-      (spit "similarities.csv" (str user-id ":" (clojure.string/join "," (.mostSimilarUserIDs recommender user-id k) )  \newline) :append true))))
+      (println (str user-id ":" (clojure.string/join "," (.mostSimilarUserIDs recommender user-id k)))))
+
+    (println "================")
+    (doseq [user-id (range n)]
+      (println user-id)
+      (doseq [other-id (range n)]
+        (println (str "  " other-id ":" (.userSimilarity similarity user-id other-id))))
+      )
+
+    ;; (doseq [user-id (range n)]
+    ;;   (spit "zsimilarities.csv" (str user-id ":" (clojure.string/join "," (.mostSimilarUserIDs recommender user-id k)) \newline) :append true)
+    ;; )))
+
+    )
+  )
 
 (comment
-  (find-similar-users 1000 3))
+  (find-similar-users 7 3))
