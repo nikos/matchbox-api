@@ -24,9 +24,11 @@
     datasource
     ))
 
+(def datasource (get-datasource specification))
+
 (defn find-similar-users
   "For n most similar users to given user-id."
-  [datasource n user-id]
+  [n user-id]
   (let [model (MySQLJDBCDataModel. datasource)
         similarity (PearsonCorrelationSimilarity. model)
         neighborhood (NearestNUserNeighborhood. 2 similarity model)
@@ -37,11 +39,9 @@
     (println "================")
     (doseq [other-id similar-users]
         (println (str "  " other-id ":" (.userSimilarity similarity user-id other-id))))
+    (str user-id ":" (clojure.string/join "," similar-users))
     )
   )
 
-
-(def datasource (get-datasource specification))
-
 (comment
-  (find-similar-users datasource 3 0))
+  (find-similar-users 3 0))
