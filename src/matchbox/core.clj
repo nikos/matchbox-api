@@ -37,11 +37,6 @@
     (println "================")
     (doseq [other-id similar-users]
         (println (str "  " other-id ":" (.userSimilarity similarity user-id other-id))))
-
-    ;; (doseq [user-id (range n)]
-    ;;   (spit "zsimilarities.csv" (str user-id ":" (clojure.string/join "," (.mostSimilarUserIDs recommender user-id k)) \newline) :append true)
-    ;; )))
-
     )
   )
 
