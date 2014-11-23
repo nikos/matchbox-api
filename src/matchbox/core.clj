@@ -25,23 +25,18 @@
     ))
 
 (defn find-similar-users
-  "For n users find the k most similar."
-  [datasource n k]
+  "For n most similar users to given user-id."
+  [datasource n user-id]
   (let [model (MySQLJDBCDataModel. datasource)
         similarity (PearsonCorrelationSimilarity. model)
         neighborhood (NearestNUserNeighborhood. 2 similarity model)
-        recommender (GenericUserBasedRecommender. model neighborhood similarity)]
+        recommender (GenericUserBasedRecommender. model neighborhood similarity)
+        similar-users (.mostSimilarUserIDs recommender user-id n)]
 
+    (println (str user-id ":" (clojure.string/join "," similar-users)))
     (println "================")
-    (doseq [user-id (range n)]
-      (println (str user-id ":" (clojure.string/join "," (.mostSimilarUserIDs recommender user-id k)))))
-
-    (println "================")
-    (doseq [user-id (range n)]
-      (println user-id)
-      (doseq [other-id (range n)]
+    (doseq [other-id similar-users]
         (println (str "  " other-id ":" (.userSimilarity similarity user-id other-id))))
-      )
 
     ;; (doseq [user-id (range n)]
     ;;   (spit "zsimilarities.csv" (str user-id ":" (clojure.string/join "," (.mostSimilarUserIDs recommender user-id k)) \newline) :append true)
