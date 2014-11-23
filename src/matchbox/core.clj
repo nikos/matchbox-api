@@ -1,17 +1,33 @@
 (ns matchbox.core
   (:require clojure.string)
-  (:import [org.apache.mahout.cf.taste.eval RecommenderBuilder]
-           [org.apache.mahout.cf.taste.impl.model.file FileDataModel]
+  (:import [org.apache.mahout.cf.taste.impl.model.jdbc MySQLJDBCDataModel]
            [org.apache.mahout.cf.taste.impl.similarity PearsonCorrelationSimilarity]
            [org.apache.mahout.cf.taste.impl.neighborhood NearestNUserNeighborhood]
            [org.apache.mahout.cf.taste.impl.recommender GenericUserBasedRecommender]
-           [org.apache.mahout.cf.taste.impl.eval AverageAbsoluteDifferenceRecommenderEvaluator]
-           [java.io File]))
+           [com.mysql.jdbc.jdbc2.optional MysqlDataSource]))
+
+(def specification {
+                    :servername "localhost"
+                    :database "matchbox"
+                    :user "niko"
+                    :password ""
+                    })
+
+(defn get-datasource
+  "Get JDBC DataSource (for proper data access)"
+  [specification]
+  (let [datasource (MysqlDataSource.)]
+    (.setServerName datasource (:servername specification))
+    (.setDatabaseName datasource (:database specification))
+    (.setUser datasource (:user specification))
+    (.setPassword datasource (:password specification))
+    datasource
+    ))
 
 (defn find-similar-users
   "For n users find the k most similar."
-  [n k]
-  (let [model (FileDataModel. (File. "test/data/simple-interests.csv"))
+  [datasource n k]
+  (let [model (MySQLJDBCDataModel. datasource)
         similarity (PearsonCorrelationSimilarity. model)
         neighborhood (NearestNUserNeighborhood. 2 similarity model)
         recommender (GenericUserBasedRecommender. model neighborhood similarity)]
@@ -34,5 +50,7 @@
     )
   )
 
+;; (get-datasource specification)
+
 (comment
-  (find-similar-users 7 3))
+  (find-similar-users datasource 7 3))
