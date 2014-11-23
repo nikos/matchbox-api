@@ -45,7 +45,8 @@
     )
   )
 
-;; (get-datasource specification)
+
+(def datasource (get-datasource specification))
 
 (comment
-  (find-similar-users datasource 7 3))
+  (find-similar-users datasource 3 0))
