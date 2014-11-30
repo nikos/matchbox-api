@@ -36,8 +36,11 @@
     <orderEntry type="library" name="Leiningen: org.apache.lucene/lucene-analyzers-common:4.6.1" level="project" />
     <orderEntry type="library" name="Leiningen: org.apache.lucene/lucene-core:4.6.1" level="project" />
     <orderEntry type="library" name="Leiningen: org.apache.mahout.commons/commons-cli:2.0-mahout" level="project" />
+    <orderEntry type="library" name="Leiningen: org.apache.mahout/mahout-math:0.9" level="project" />
+    <orderEntry type="library" name="Leiningen: org.apache.solr/solr-commons-csv:3.5.0" level="project" />
     <orderEntry type="library" name="Leiningen: org.codehaus.jackson/jackson-core-asl:1.9.12" level="project" />
     <orderEntry type="library" name="Leiningen: org.codehaus.jackson/jackson-mapper-asl:1.9.12" level="project" />
+    <orderEntry type="library" name="Leiningen: org.slf4j/slf4j-api:1.7.5" level="project" />
     <orderEntry type="library" name="Leiningen: xmlpull:1.1.3.1" level="project" />
     <orderEntry type="library" name="Leiningen: xpp3/xpp3_min:1.1.4c" level="project" />
     <orderEntry type="library" name="Leiningen: com.sun.jersey/jersey-core:1.8" level="project" />
@@ -64,11 +67,8 @@
     <orderEntry type="library" name="Leiningen: commons-lang:2.4" level="project" />
     <orderEntry type="library" name="Leiningen: commons-beanutils:1.7.0" level="project" />
     <orderEntry type="library" name="Leiningen: commons-logging:1.0.3" level="project" />
-    <orderEntry type="library" name="Leiningen: commons-io:2.4" level="project" />
-    <orderEntry type="library" name="Leiningen: org.apache.mahout/mahout-math:0.9" level="project" />
-    <orderEntry type="library" name="Leiningen: org.apache.solr/solr-commons-csv:3.5.0" level="project" />
-    <orderEntry type="library" name="Leiningen: org.slf4j/slf4j-api:1.7.5" level="project" />
     <orderEntry type="library" name="Leiningen: com.google.guava/guava:16.0" level="project" />
+    <orderEntry type="library" name="Leiningen: commons-io:2.4" level="project" />
     <orderEntry type="library" name="Leiningen: ring/ring-anti-forgery:1.0.0" level="project" />
     <orderEntry type="library" name="Leiningen: ring/ring-core:1.3.1" level="project" />
     <orderEntry type="library" name="Leiningen: ring/ring-headers:0.1.1" level="project" />
