@@ -2,9 +2,9 @@
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [matchbox.core :as mc]
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults]])
-  (:use [ring.middleware.json :only [wrap-json-response]]
-        [ring.util.response :only [response]]))
+            [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
+            [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
+            [ring.util.response :refer [response]]))
 
 (defn my-calc
   "Just testing"
@@ -12,25 +12,24 @@
   (* 5 25))
 
 
-(defn show-similar-users
+(defn get-similar-users
   "Looks up similar user via mahout"
   [user-id]
   ;;(str "sim" user-id)
-  (str "Result:" (mc/find-similar-users 3 user-id))
-  ;; (with-connection config/db-connection-params
-  ;;                 (view/edit (model/find-id id)))
+  {:recommended (mc/find-similar-users 3 user-id)}
   )
 
 
 (defroutes app-routes
   (GET "/" [] (str "Huhu World" (my-calc)))
   (GET "/test.json" [] (response {:nickname "getMessages" :summary "Get message"}))
-  (GET "/sim/:user-id" [user-id] (show-similar-users (Integer/parseInt user-id)))
+  (GET "/sim/:user-id" [user-id] (response (get-similar-users (Integer/parseInt user-id))))
   (route/not-found "Not Found"))
 
 ;; TODO: Add logging: https://github.com/pjlegato/ring.middleware.logger
 (def app
-  (-> (wrap-defaults app-routes site-defaults)
+  (-> (wrap-defaults app-routes api-defaults)
+      (wrap-json-body {:keywords? true})
       (wrap-json-response)))
 
   ;;  (-> handler
