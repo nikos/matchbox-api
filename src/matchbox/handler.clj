@@ -1,10 +1,10 @@
 (ns matchbox.handler
   (:require [compojure.core :refer :all]
+            [compojure.handler :as handler]
             [compojure.route :as route]
             [matchbox.core :as mc]
-            [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
-            [ring.util.response :refer [response]]))
+            [ring.util.response :as r]))
 
 (defn my-calc
   "Just testing"
@@ -21,23 +21,28 @@
 
 
 (defroutes app-routes
-  (GET "/" [] (str "Huhu World" (my-calc)))
-  (GET "/test.json" [] (response {:nickname "getMessages" :summary "Get message"}))
-  (GET "/sim/:user-id" [user-id] (response (get-similar-users (Integer/parseInt user-id))))
-  (route/not-found "Not Found"))
+           (GET "/" []
+                (str "Huhu World" (my-calc)))
+           (GET "/test.json" []
+                (-> (r/response {:nickname "getMessages" :summary "Get message"})
+                    (r/header "Content-Type" "application/json")))
+           (GET "/sim/:user-id" [user-id]
+                (-> (r/response (get-similar-users (Integer/parseInt user-id)))
+                    ))
+           (route/not-found
+                "Not Found"))
 
 ;; TODO: Add logging: https://github.com/pjlegato/ring.middleware.logger
 (def app
-  (-> (wrap-defaults app-routes api-defaults)
+  (-> (handler/api app-routes)
       (wrap-json-body {:keywords? true})
       (wrap-json-response)))
 
-  ;;  (-> handler
-  ;;    (wrap wrap-flash (get-in config [:session :flash] false))
+;;  (-> handler
+;;    (wrap wrap-flash (get-in config [:session :flash] false))
 
 
-      ;; (-> #'handler
-      ;;    (ring.middleware.stacktrace/wrap-stacktrace)
+;; (-> #'handler
+;;    (ring.middleware.stacktrace/wrap-stacktrace)
 
-      ;;    (wrap-defaults app-routes site-defaults)
-
+;;    (wrap-defaults app-routes site-defaults)
