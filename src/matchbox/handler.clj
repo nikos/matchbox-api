@@ -4,7 +4,8 @@
             [compojure.route :as route]
             [matchbox.core :as mc]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
-            [ring.util.response :as r]))
+            [ring.util.response :refer [response]]))
+
 
 (defn my-calc
   "Just testing"
@@ -24,11 +25,9 @@
            (GET "/" []
                 (str "Huhu World" (my-calc)))
            (GET "/test.json" []
-                (-> (r/response {:nickname "getMessages" :summary "Get message"})
-                    (r/header "Content-Type" "application/json")))
+                (response {:nickname "getMessages" :summary "Get message"}))
            (GET "/sim/:user-id" [user-id]
-                (-> (r/response (get-similar-users (Integer/parseInt user-id)))
-                    ))
+                (response (get-similar-users (Integer/parseInt user-id))))
            (route/not-found
                 "Not Found"))
 
