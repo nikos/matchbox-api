@@ -1,5 +1,5 @@
 (ns matchbox.config
-  (:import (com.mysql.jdbc.jdbc2.optional MysqlDataSource)))
+  (:import (com.mysql.jdbc.jdbc2.optional MysqlConnectionPoolDataSource)))
 
 (def production?
   (= "production" (System/getenv "RING_ENV")))
@@ -14,26 +14,25 @@
      :subprotocol "mysql"
      :subname     "//localhost:3306/matchbox"
      :user        "niko"
-     :password    ""
-     }))
+     :password    ""}))
 
-; Used for building DataSource for Mahout (TODO: harmonize)
+;; Used for building DataSource for Mahout (TODO: harmonize)
 (def db-specification
   {:servername "localhost"
    :database   "matchbox"
    :user       "niko"
-   :password   ""
-   })
+   :password   ""})
+
+;; com.mchange.v2.c3p0.DataSources  DataSources/pooledDataSource
 
 (defn get-datasource
   "Get JDBC DataSource (for proper data access)"
   [specification]
-  (let [datasource (MysqlDataSource.)]
+  (let [datasource (MysqlConnectionPoolDataSource.)]
     (.setServerName datasource (:servername specification))
     (.setDatabaseName datasource (:database specification))
     (.setUser datasource (:user specification))
     (.setPassword datasource (:password specification))
-    datasource
-    ))
+    datasource))
 
 (def datasource (get-datasource db-specification))

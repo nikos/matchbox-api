@@ -9,6 +9,7 @@
                  [org.apache.mahout/mahout-integration "0.9"]
                  [mysql/mysql-connector-java "5.1.34"]
                  [compojure "1.2.0"]
+                 [ring.middleware.logger "0.5.0"]
                  [ring/ring-defaults "0.1.2"]
                  [ring/ring-json "0.3.1"]]
   :plugins [[lein-ring "0.8.13"]]
