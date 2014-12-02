@@ -7,6 +7,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.apache.mahout/mahout-core "0.9" :exclusions [commons-codec]]
                  [org.apache.mahout/mahout-integration "0.9"]
+                 [org.clojure/java.jdbc "0.3.6"]
                  [mysql/mysql-connector-java "5.1.34"]
                  [compojure "1.2.0"]
                  [ring.middleware.logger "0.5.0"]

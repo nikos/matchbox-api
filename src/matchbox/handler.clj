@@ -2,7 +2,9 @@
   (:require [compojure.core :refer :all]
             [compojure.handler :as handler]
             [compojure.route :as route]
+            [clojure.java.jdbc :as jdbc]
             [matchbox.core :as mc]
+            [matchbox.config :as config]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
             [ring.util.response :refer [response]]))
@@ -14,6 +16,14 @@
   (* 5 25))
 
 
+(defn get-tastes
+  "Retrieve all tastes from the database"
+  []
+  (jdbc/query {:datasource config/datasource}
+              ["select * from taste_preferences where user_id < ?" 10]
+              :as-arrays? true))
+;;:row-fn println))
+
 (defn get-similar-users
   "Looks up similar user via mahout"
   [user-id]
@@ -23,6 +33,8 @@
 (defroutes app-routes
            (GET "/" []
                 (str "Huhu World" (my-calc)))
+           (GET "/tastes.json" []
+                (str "Tastes:" (get-tastes)))
            (GET "/test.json" []
                 (response {:nickname "getMessages" :summary "Get message"}))
            (GET "/sim/:user-id" [user-id]
@@ -32,7 +44,7 @@
 
 ;; TODO: Add logging: https://github.com/pjlegato/ring.middleware.logger
 (def app
-  (-> (handler/api app-routes)                   ;; TODO: doch lieber wieder zurück zu defaults? (01-12)
+  (-> (handler/api app-routes)                              ;; TODO: doch lieber wieder zurück zu defaults? (01-12)
       (wrap-with-logger)
       (wrap-json-body {:keywords? true})
       (wrap-json-response)))
