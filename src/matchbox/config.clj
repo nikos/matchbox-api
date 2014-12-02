@@ -23,12 +23,10 @@
    :user       "niko"
    :password   ""})
 
-;; com.mchange.v2.c3p0.DataSources  DataSources/pooledDataSource
-
 (defn get-datasource
   "Get JDBC DataSource (for proper data access)"
   [specification]
-  (let [datasource (MysqlConnectionPoolDataSource.)]
+  (let [datasource (MysqlConnectionPoolDataSource.)]  ;; TODO com.mchange.v2.c3p0.DataSources  DataSources/pooledDataSource
     (.setServerName datasource (:servername specification))
     (.setDatabaseName datasource (:database specification))
     (.setUser datasource (:user specification))

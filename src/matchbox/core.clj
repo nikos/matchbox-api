@@ -1,7 +1,7 @@
 (ns matchbox.core
   (:require clojure.string)
   (:use [matchbox.config :as config])
-  (:import [org.apache.mahout.cf.taste.impl.model.jdbc MySQLJDBCDataModel]
+  (:import [org.apache.mahout.cf.taste.impl.model.jdbc MySQLJDBCDataModel ReloadFromJDBCDataModel]
            [org.apache.mahout.cf.taste.impl.similarity PearsonCorrelationSimilarity]
            [org.apache.mahout.cf.taste.impl.neighborhood NearestNUserNeighborhood]
            [org.apache.mahout.cf.taste.impl.recommender GenericUserBasedRecommender]))
@@ -9,7 +9,7 @@
 (defn find-similar-users
   "For n most similar users to given user-id."
   [n user-id]
-  (let [model (MySQLJDBCDataModel. config/datasource)
+  (let [model (ReloadFromJDBCDataModel. (MySQLJDBCDataModel. config/datasource))
         similarity (PearsonCorrelationSimilarity. model)
         neighborhood (NearestNUserNeighborhood. 2 similarity model)
         recommender (GenericUserBasedRecommender. model neighborhood similarity)
