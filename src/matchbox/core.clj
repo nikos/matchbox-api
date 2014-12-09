@@ -1,7 +1,7 @@
 (ns matchbox.core
   (:require clojure.string)
   (:use [matchbox.config :as config])
-  (:import [org.apache.mahout.cf.taste.impl.model.jdbc MySQLJDBCDataModel ReloadFromJDBCDataModel]
+  (:import [org.apache.mahout.cf.taste.impl.model.mongodb MongoDBDataModel]
            [org.apache.mahout.cf.taste.impl.similarity PearsonCorrelationSimilarity]
            [org.apache.mahout.cf.taste.impl.neighborhood NearestNUserNeighborhood]
            [org.apache.mahout.cf.taste.impl.recommender GenericUserBasedRecommender]))
@@ -9,16 +9,17 @@
 (defn find-similar-users
   "For n most similar users to given user-id."
   [n user-id]
-  (let [model (ReloadFromJDBCDataModel. (MySQLJDBCDataModel. config/datasource))
+  (let [model (MongoDBDataModel. "localhost" 27017 "matchbox" "ratings" false false nil)
         similarity (PearsonCorrelationSimilarity. model)
         neighborhood (NearestNUserNeighborhood. 2 similarity model)
         recommender (GenericUserBasedRecommender. model neighborhood similarity)
-        similar-users (.mostSimilarUserIDs recommender user-id n)]
+        long-id (Long/parseLong (.fromIdToLong model user-id true))
+        similar-users (.mostSimilarUserIDs recommender long-id n)]
 
     (println (str user-id ":" (clojure.string/join "," similar-users)))
     (println "================")
     (doseq [other-id similar-users]
-      (println (str "  " other-id ":" (.userSimilarity similarity user-id other-id))))
+      (println (str "  " other-id ":" (.userSimilarity similarity long-id other-id))))
     (str user-id ":" (clojure.string/join "," similar-users))
     )
   )

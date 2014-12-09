@@ -2,9 +2,9 @@
   (:require [compojure.core :refer :all]
             [compojure.handler :as handler]
             [compojure.route :as route]
-            [clojure.java.jdbc :as jdbc]
             [matchbox.core :as mc]
             [matchbox.config :as config]
+            [matchbox.models.rating :as taste]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
             [ring.util.response :refer [response]]))
@@ -19,10 +19,8 @@
 (defn get-tastes
   "Retrieve all tastes from the database"
   []
-  (jdbc/query {:datasource config/datasource}
-              ["select * from taste_preferences where user_id < ?" 10]
-              :as-arrays? true))
-;;:row-fn println))
+  (taste/all))
+
 
 (defn get-similar-users
   "Looks up similar user via mahout"
@@ -38,7 +36,7 @@
            (GET "/test.json" []
                 (response {:nickname "getMessages" :summary "Get message"}))
            (GET "/sim/:user-id" [user-id]
-                (response (get-similar-users (Integer/parseInt user-id))))
+                (response (get-similar-users user-id)))
            (route/not-found
                 "Not Found"))
 
