@@ -8,7 +8,7 @@ Start compojure with ring call:
 
 Example call:
 
-    (use 'matchbox.core)
+    (use 'matchbox.services.recommender)
     (find-similar-users 7 3)
 
 

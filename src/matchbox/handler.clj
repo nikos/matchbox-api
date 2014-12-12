@@ -2,18 +2,11 @@
   (:require [compojure.core :refer :all]
             [compojure.handler :as handler]
             [compojure.route :as route]
-            [matchbox.core :as mc]
-            [matchbox.config :as config]
+            [matchbox.services.recommender :as recommender]
             [matchbox.models.rating :as rating]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
             [ring.util.response :refer [response]]))
-
-
-(defn my-calc
-  "Just testing"
-  []
-  (* 5 25))
 
 
 (defn get-tastes
@@ -25,12 +18,12 @@
 (defn get-similar-users
   "Looks up similar user via mahout"
   [user-id]
-  {:recommended (mc/find-similar-users 3 user-id)})
+  {:recommended (recommender/find-similar-users 3 user-id)})
 
 
 (defroutes app-routes
            (GET "/" []
-                (str "Huhu World" (my-calc)))
+                (str "Huhu World" "Test"))
            (GET "/tastes.json" []
                 (str "Tastes:" (get-tastes)))
            (GET "/test.json" []

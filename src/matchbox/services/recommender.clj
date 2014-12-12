@@ -1,4 +1,4 @@
-(ns matchbox.core
+(ns matchbox.services.recommender
   (:import (org.apache.mahout.cf.taste.impl.similarity PearsonCorrelationSimilarity))
   (:require clojure.string
             [matchbox.config :as config])

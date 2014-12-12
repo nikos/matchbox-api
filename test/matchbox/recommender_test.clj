@@ -1,6 +1,6 @@
-(ns matchbox.core-test
+(ns matchbox.recommender-test
   (:require [clojure.test :refer :all]
-            [matchbox.core :refer :all]))
+            [matchbox.services.recommender :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."
