@@ -1,27 +1,28 @@
 (ns matchbox.models.rating
   (:require [monger.core :as mongo]
-            [monger.collection :as coll]))
+            [monger.collection :as coll]
+            [matchbox.config :as config]))
+
+(def dbname
+  (get config/db-specification :database))
+
+(def collname
+  (get config/db-specification :collection))
+
 
 ;; TODO make connection parameters configurable
 (def get-db
-  (mongo/get-db (mongo/connect) "matchbox"))
+  (mongo/get-db (mongo/connect) dbname))
 
-;; Only for testing
-(let [db get-db
-      coll "ratings"]
-  (coll/insert db coll {:first_name "John" :last_name "Lennon"})
-  (coll/insert db coll {:first_name "Ringo" :last_name "Starr"})
-
-  (coll/find db coll {:first_name "Ringo"}))
 
 (defn all []
-  (coll/find-maps get-db "ratings"))
+  (coll/find-maps get-db collname))
 
 (defn create [name street]
-  (coll/insert get-db "ratings" {:name name :street street}))
+  (coll/insert get-db collname {:name name :street street}))
 
 (defn find-user [user-id]
-  (coll/find-one-as-map get-db "ratings" {:user-id user-id}))
+  (coll/find-one-as-map get-db collname {:user-id user-id}))
 
 (defn update [id name street]
-  (coll/update get-db "ratings" {:_id id} {:name name :street street} {:multi false}))
+  (coll/update get-db collname {:_id id} {:name name :street street} {:multi false}))

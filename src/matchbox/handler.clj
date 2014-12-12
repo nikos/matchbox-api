@@ -4,7 +4,7 @@
             [compojure.route :as route]
             [matchbox.core :as mc]
             [matchbox.config :as config]
-            [matchbox.models.rating :as taste]
+            [matchbox.models.rating :as rating]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
             [ring.util.response :refer [response]]))
@@ -19,7 +19,7 @@
 (defn get-tastes
   "Retrieve all tastes from the database"
   []
-  (taste/all))
+  (rating/all))
 
 
 (defn get-similar-users
@@ -42,7 +42,7 @@
 
 ;; TODO: Add logging: https://github.com/pjlegato/ring.middleware.logger
 (def app
-  (-> (handler/api app-routes)                              ;; TODO: doch lieber wieder zurück zu defaults? (01-12)
+  (-> (handler/api app-routes)                  ;; TODO: doch lieber wieder zurück zu defaults? (01-12)
       (wrap-with-logger)
       (wrap-json-body {:keywords? true})
       (wrap-json-response)))
