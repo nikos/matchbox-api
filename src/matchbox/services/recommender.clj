@@ -2,10 +2,10 @@
   (:import (org.apache.mahout.cf.taste.impl.similarity PearsonCorrelationSimilarity))
   (:require clojure.string
             [matchbox.config :as config])
-  (:import  org.apache.mahout.cf.taste.impl.model.mongodb.MongoDBDataModel
-            org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity
-            org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood
-            org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender))
+  (:import org.apache.mahout.cf.taste.impl.model.mongodb.MongoDBDataModel
+           org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity
+           org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood
+           org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender))
 
 
 (defn get-datamodel

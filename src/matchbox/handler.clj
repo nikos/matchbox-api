@@ -9,10 +9,12 @@
             [ring.util.response :refer [response]]))
 
 
+(defstruct taste :user_id :item_id :preference :created_at)
+
 (defn get-tastes
   "Retrieve all tastes from the database"
   []
-  (rating/all))
+  {:results (rating/all)})
 
 
 (defn get-similar-users
@@ -25,7 +27,7 @@
            (GET "/" []
                 (str "Huhu World" "Test"))
            (GET "/tastes.json" []
-                (str "Tastes:" (get-tastes)))
+                (response (get-tastes)))
            (GET "/test.json" []
                 (response {:nickname "getMessages" :summary "Get message"}))
            (GET "/sim/:user-id" [user-id]

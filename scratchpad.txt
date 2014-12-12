@@ -1,0 +1,5 @@
+(map (fn [rating]
+         struct-map taste
+          :user_id (get rating "user_id")
+          :item_id (get rating "item_id"))
+       rating/all))
