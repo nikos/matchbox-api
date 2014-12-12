@@ -29,6 +29,8 @@
   (.fromLongToId model id))
 
 
+(defstruct recommend :user-id :object-id)
+
 (defn find-similar-users
   "For n most similar users to given user-id."
   [n user-id]
@@ -39,14 +41,13 @@
         long-id (id-to-long model user-id)
         similar-users (.mostSimilarUserIDs recommender long-id n)]
 
-    (println (str user-id ":" (clojure.string/join "," similar-users)))
-    (println "================")
-    (doseq [other-id similar-users]
-      (println (str "  OTHER: " (long-to-id model other-id) ":")))
-    ;;(println (str "  " (other-id) ":" (.userSimilarity similarity long-id other-id)))
-    (str user-id ":" (clojure.string/join "," similar-users))
-    )
-  )
+    ;; translate LongIds as returned by Mahout into MongoDB ObjectID
+    (map (fn [user-id]
+           (struct-map recommend
+             :user-id user-id
+             :object-id (long-to-id model user-id)))
+         similar-users)))
+
 
 (comment
   (find-similar-users 3 0))
