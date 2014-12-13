@@ -1,7 +1,10 @@
 (ns matchbox.handler
-  (:require [compojure.core :refer :all]
-            [compojure.handler :as handler]
+  (:use compojure.core)
+  (:use cheshire.core)
+  (:use ring.util.response)
+  (:require [compojure.handler :as handler]
             [compojure.route :as route]
+            [monger.json]
             [matchbox.services.recommender :as recommender]
             [matchbox.models.rating :as rating]
             [ring.middleware.logger :refer [wrap-with-logger]]
@@ -14,7 +17,7 @@
 (defn get-tastes
   "Retrieve all tastes from the database"
   []
-  {:results (rating/all)})
+  (response {:results (rating/all)}))
 
 
 (defn get-similar-users
@@ -26,8 +29,7 @@
 (defroutes app-routes
            (GET "/" []
                 (str "Huhu World" "Test"))
-           (GET "/tastes.json" []
-                (response (get-tastes)))
+           (GET "/tastes.json" [] (get-tastes))
            (GET "/test.json" []
                 (response {:nickname "getMessages" :summary "Get message"}))
            (GET "/sim/:user-id" [user-id]
