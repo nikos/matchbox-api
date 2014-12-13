@@ -1,18 +1,19 @@
 (ns matchbox.models.rating
+  (:import (org.bson.types ObjectId))
   (:require [monger.collection :as coll]
             [matchbox.config :refer [db coll-ratings]]))
 
 (defn all []
   (coll/find-maps db coll-ratings))
 
-(defn create [name street]
-  (coll/insert db coll-ratings {:name name :street street}))
+(defn find-by-id [id]
+  (coll/find-one-as-map db coll-ratings {:_id (ObjectId. id)}))
 
-(defn create-full [rating]
+(defn create [rating]
   (coll/insert-and-return db coll-ratings rating))
 
-(defn find-user [user-id]
-  (coll/find-one-as-map db coll-ratings {:user-id user-id}))
+(defn update [id rating]
+  (coll/update-by-id db coll-ratings (ObjectId. id) {:name (rating :name)} {:multi false}))
 
-(defn update [id name street]
-  (coll/update db coll-ratings {:_id id} {:name name :street street} {:multi false}))
+(defn delete [id]
+  (coll/remove-by-id db coll-ratings (ObjectId. id)))
