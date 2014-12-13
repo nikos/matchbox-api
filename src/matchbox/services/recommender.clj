@@ -1,7 +1,7 @@
 (ns matchbox.services.recommender
   (:import (org.apache.mahout.cf.taste.impl.similarity PearsonCorrelationSimilarity))
   (:require clojure.string
-            [matchbox.config :as config])
+            [matchbox.config :refer [db-specification coll-ratings]])
   (:import org.apache.mahout.cf.taste.impl.model.mongodb.MongoDBDataModel
            org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity
            org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood
@@ -11,25 +11,28 @@
 (defn get-datamodel
   "INTERNAL: Retrieve access to data model"
   []
-  (MongoDBDataModel. (get config/db-specification :servername)
-                     (get config/db-specification :port)
-                     (get config/db-specification :database)
-                     (get config/db-specification :collection)
+  (MongoDBDataModel. (db-specification :servername)
+                     (db-specification :port)
+                     (db-specification :database)
+                     (coll-ratings)
                      false false nil)                       ; manage finalRemove dateFormat
   )
 
+;; TODO: make private
 (defn id-to-long
   "From User Object-ID (String) to a Long Value"
   [model id]
   (Long/parseLong (.fromIdToLong model id true)))
 
+;; TODO: make private
 (defn long-to-id
   "From Long Value to an User Object-ID (String)"
   [model id]
   (.fromLongToId model id))
 
 
-(defstruct recommend :user-id :object-id)
+(defstruct recommend
+  :user-id :object-id)
 
 (defn find-similar-users
   "For n most similar users to given user-id."
