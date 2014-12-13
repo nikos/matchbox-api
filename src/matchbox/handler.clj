@@ -10,7 +10,7 @@
             [matchbox.models.user :as user]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
-            [ring.util.response :refer [response]]))
+            [ring.util.response :refer [response not-found]]))
 
 
 (defn get-all-ratings []
@@ -30,11 +30,18 @@
   (response (user/create doc)))
 
 (defn update-user [id doc]
-  (response {:user (user/update id doc)}))
+  (let [user (user/find-by-id id)]
+    (cond
+      (empty? user) (not-found "User does not exist")
+      :else (do (user/update id doc)
+                (response "OK")))))
 
 (defn delete-user [id]
-  (user/delete id)
-  (response "OK"))
+  (let [user (user/find-by-id id)]
+    (cond
+      (empty? user) (not-found "User does not exist")
+      :else (do (user/delete id)
+                (response "OK")))))
 
 
 (defn get-similar-users
@@ -50,13 +57,13 @@
                 (response {:nickname "getMessages" :summary "Get message"}))
 
            (context "/users" []
-                (defroutes users-routes
-                     (GET "/" [] (get-all-users))
-                     (POST "/" {body :body} (create-new-user body))
-                     (context "/:id" [id] (defroutes user-routes
-                           (GET    "/" [] (get-user id))
-                           (PUT    "/" {body :body} (update-user id body))
-                           (DELETE "/" [] (delete-user id))))))
+                    (defroutes users-routes
+                               (GET "/" [] (get-all-users))
+                               (POST "/" {body :body} (create-new-user body))
+                               (context "/:id" [id] (defroutes user-routes
+                                                               (GET "/" [] (get-user id))
+                                                               (PUT "/" {body :body} (update-user id body))
+                                                               (DELETE "/" [] (delete-user id))))))
 
            (context "/ratings" []
                     (defroutes ratings-routes
