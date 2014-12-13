@@ -13,7 +13,7 @@
                  [ring/ring-defaults "0.1.2"]
                  [ring/ring-json "0.3.1"]]
   :plugins [[lein-ring "0.8.13"]]
-  :ring {:handler matchbox.handler/app}
+  :ring {:handler matchbox.genapi/app}
 
   ;; Only for debugging required
   :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]
