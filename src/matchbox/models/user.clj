@@ -1,18 +1,19 @@
 (ns matchbox.models.user
+  (:import (org.bson.types ObjectId))
   (:require [monger.collection :as coll]
             [matchbox.config :refer [db coll-users]]))
 
 (defn all []
   (coll/find-maps db coll-users))
 
-(defn create [name street]
-  (coll/insert db coll-users {:name name :street street}))
+(defn find-by-id [id]
+  (coll/find-one-as-map db coll-users {:_id (ObjectId. id)}))
 
-(defn create-full [user]
+(defn create [user]
   (coll/insert-and-return db coll-users user))
 
-(defn find-user [user-id]
-  (coll/find-one-as-map db coll-users {:user-id user-id}))
+(defn update [id user]
+  (coll/update-by-id db coll-users (ObjectId. id) {:name (user :name)} {:multi false}))
 
-(defn update [id name street]
-  (coll/update db coll-users {:_id id} {:name name :street street} {:multi false}))
+(defn delete [id]
+  (coll/remove-by-id db coll-users (ObjectId. id)))

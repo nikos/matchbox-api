@@ -13,44 +13,63 @@
             [ring.util.response :refer [response]]))
 
 
-(defn get-ratings
-  "Retrieve all ratings from the database"
-  []
+(defn get-all-ratings []
   (response {:ratings (rating/all)}))
+
+(defn create-new-rating [doc]
+  (response (rating/create-full doc)))
 
 
 (defn get-all-users []
   (response {:users (user/all)}))
 
+(defn get-user [id]
+  (response {:user (user/find-by-id id)}))
+
 (defn create-new-user [doc]
-  (response (user/create-full doc)))
+  (response (user/create doc)))
+
+(defn update-user [id doc]
+  (response {:user (user/update id doc)}))
+
+(defn delete-user [id]
+  (user/delete id)
+  (response "OK"))
 
 
 (defn get-similar-users
   "Looks up similar user via mahout"
   [user-id]
-  {:recommended (recommender/find-similar-users 3 user-id)})
+  (response {:recommended (recommender/find-similar-users 3 user-id)}))
 
 
 (defroutes app-routes
-           (context "/users" []
-                    (defroutes users-routes
-                               (GET "/" [] (get-all-users))
-                               (POST "/" {body :body} (create-new-user body))))
 
-           (GET "/" []
-                (str "Huhu World" "Test"))
-           (GET "/tastes.json" [] (get-ratings))
+           (GET "/" [] (str "Welcome to matchbox"))
            (GET "/test.json" []
                 (response {:nickname "getMessages" :summary "Get message"}))
-           (GET "/sim/:user-id" [user-id]
-                (response (get-similar-users user-id)))
+
+           (context "/users" []
+                (defroutes users-routes
+                     (GET "/" [] (get-all-users))
+                     (POST "/" {body :body} (create-new-user body))
+                     (context "/:id" [id] (defroutes user-routes
+                           (GET    "/" [] (get-user id))
+                           (PUT    "/" {body :body} (update-user id body))
+                           (DELETE "/" [] (delete-user id))))))
+
+           (context "/ratings" []
+                    (defroutes ratings-routes
+                               (GET "/" [] (get-all-ratings))
+                               (POST "/" {body :body} (create-new-rating body))
+                               (GET "/similar/:user-id" [user-id] (get-similar-users user-id))))
+
            (route/not-found
-                "Not Found"))
+             "Not Found"))
 
 ;; Bootstraps the API (refer by project.clj)
 (def app
-  (-> (handler/api app-routes)                  ;; TODO: doch lieber wieder zurück zu defaults? (01-12)
+  (-> (handler/api app-routes)                              ;; TODO: doch lieber wieder zurück zu defaults? (01-12)
       (wrap-with-logger)
       (wrap-json-body {:keywords? true})
       (wrap-json-response)))

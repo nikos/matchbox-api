@@ -9,6 +9,7 @@
                  [org.apache.mahout/mahout-core "0.9" :exclusions [commons-codec]]
                  [org.apache.mahout/mahout-integration "0.9"]
                  [com.novemberain/monger "2.0.1"]
+                 [prismatic/schema "0.3.3"]
                  [compojure "1.3.1"]
                  [ring.middleware.logger "0.5.0"]
                  [ring/ring-defaults "0.1.2"]
