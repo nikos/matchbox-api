@@ -14,6 +14,15 @@
 
 ;; -------------------------------------------------------
 
+;; lookup: (rating/find-by-id id)
+;; update-fn: (rating/update id doc)
+
+(defn generic-update [lookup update-fn]
+  (cond
+    (empty? lookup) (not-found "Object does not exist")
+    :else (do (update-fn)
+              (response "OK"))))
+
 (defn get-all-ratings []
   (response {:ratings (rating/all)}))
 
@@ -26,14 +35,14 @@
 (defn update-rating [id doc]
   (let [rating (rating/find-by-id id)]
     (cond
-      (empty? rating) (not-found "User does not exist")
+      (empty? rating) (not-found "Rating does not exist")
       :else (do (rating/update id doc)
                 (response "OK")))))
 
 (defn delete-rating [id]
   (let [rating (rating/find-by-id id)]
     (cond
-      (empty? rating) (not-found "User does not exist")
+      (empty? rating) (not-found "Rating does not exist")
       :else (do (rating/delete id)
                 (response "OK")))))
 
@@ -92,6 +101,7 @@
                                                                (DELETE "/" [] (delete-rating id))))))
 
            (route/not-found "Not Found"))
+
 
 ;; Bootstraps the API (refer by project.clj)
 (def app
