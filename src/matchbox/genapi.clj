@@ -1,6 +1,4 @@
 (ns matchbox.genapi
-  (:import [com.mongodb DB WriteConcern]
-           [org.bson.types ObjectId])
   (:use compojure.core)
   (:use cheshire.core)
   (:use ring.util.response)
@@ -25,9 +23,10 @@
       :else (response {:result (doc "title")}))))
 
 (defroutes app-routes
-           (context "/documents" [] (defroutes documents-routes
-                                               (GET "/" [] (get-all-documents))
-                                               (POST "/" {body :body} (create-new-document body))))
+           (context "/documents" []
+                    (defroutes documents-routes
+                               (GET "/" [] (get-all-documents))
+                               (POST "/" {body :body} (create-new-document body))))
            (route/not-found "Not Found"))
 
 (def app
