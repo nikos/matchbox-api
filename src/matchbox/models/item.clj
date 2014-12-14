@@ -1,7 +1,12 @@
 (ns matchbox.models.item
   (:import (org.bson.types ObjectId))
   (:require [monger.collection :as coll]
-            [matchbox.config :refer [db coll-items]]))
+            [matchbox.config :refer [db coll-items]]
+            [schema.core :as s]))
+
+(def Item {:name                        String
+           (s/optional-key :_id)        String
+           (s/optional-key :created_at) Number})
 
 (defn all []
   (coll/find-maps db coll-items))

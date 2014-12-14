@@ -1,4 +1,5 @@
 (ns matchbox.handler
+  (:import (clojure.lang ExceptionInfo))
   (:use compojure.core)
   (:use cheshire.core)
   (:use ring.util.response)
@@ -11,7 +12,17 @@
             [matchbox.models.rating :as rating]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
-            [ring.util.response :refer [response not-found]]))
+            [ring.util.response :refer [response created not-found]]
+            [schema.core :as s]))
+
+;; -------------------------------------------------------
+
+(defn client-error
+  "Returns a 400 'Bad Request' response."
+  [body]
+  {:status  400
+   :headers {}
+   :body    body})
 
 ;; -------------------------------------------------------
 
@@ -36,7 +47,12 @@
   (response {:rating (rating/find-by-id id)}))
 
 (defn create-new-rating [doc]
-  (response (rating/create doc)))
+  (try
+    (let [validated-doc (s/validate rating/Rating doc)
+          new-rating (rating/create validated-doc)]
+      (created (str "/ratings/" (new-rating :_id)) new-rating))
+    (catch Exception e
+      (client-error (str "Problem occurred: " e)))))        ;; TODO return e as map?
 
 (defn update-rating [id doc]
   (generic-update id doc (rating/find-by-id id)
@@ -55,7 +71,12 @@
   (response {:user (user/find-by-id id)}))
 
 (defn create-new-user [doc]
-  (response (user/create doc)))
+  (try
+    (let [validated-doc (s/validate user/User doc)
+          new-user (user/create validated-doc)]
+      (created (str "/users/" (new-user :_id)) new-user))
+    (catch Exception e
+      (client-error (str "Problem occurred: " e)))))        ;; TODO return e as map?
 
 (defn update-user [id doc]
   (generic-update id doc (user/find-by-id id)
@@ -79,7 +100,12 @@
   (response {:item (item/find-by-id id)}))
 
 (defn create-new-item [doc]
-  (response (item/create doc)))
+  (try
+    (let [validated-doc (s/validate item/Item doc)
+          new-item (item/create validated-doc)]
+      (created (str "/items/" (new-item :_id)) new-item))
+    (catch Exception e
+      (client-error (str "Problem occurred: " e)))))        ;; TODO return e as map?
 
 (defn update-item [id doc]
   (generic-update id doc (item/find-by-id id)
@@ -91,9 +117,23 @@
 
 ;; -------------------------------------------------------
 
+(defn rnd-init
+  "Generates n users with 0..k interests from a set of j possible."
+  [n k j]
+  (let [interests (range j)]
+    (doall (for [user-id (range n)
+                 user-interest (take (rand-int k) (shuffle interests))]
+
+             (println (str user-id "," user-interest "," (rand))))))
+  (println (str n "," k))
+  (response "ok"))
+
+;; -------------------------------------------------------
+
 (defroutes app-routes
 
            (GET "/" [] (str "Welcome to matchbox"))
+           (GET "/rndinit" [] (rnd-init 50 8 20))
 
            (context "/users" []
                     (defroutes users-routes

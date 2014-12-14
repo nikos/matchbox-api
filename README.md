@@ -21,6 +21,61 @@ Under Mac OSX install by using `brew install mongo` and then start with the help
     sudo mongod --config /usr/local/etc/mongod.conf
 
 
+## Manage items
+
+http -v POST http://nava.de:3000/items/ name=Billard
+POST /items/ HTTP/1.1
+Accept: application/json
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Content-Length: 19
+Content-Type: application/json; charset=utf-8
+Host: nava.de:3000
+User-Agent: HTTPie/0.8.0
+
+{
+    "name": "Billard"
+}
+
+HTTP/1.1 200 OK
+Content-Length: 51
+Content-Type: application/json; charset=utf-8
+Date: Sun, 14 Dec 2014 00:44:20 GMT
+Server: Jetty(7.6.8.v20121106)
+
+{
+    "_id": "548cdd64d282a2a47b2492ae",
+    "name": "Billard"
+}
+
+    http http://nava.de:3000/items/
+
+Leads to the following sample result:
+
+    HTTP/1.1 200 OK
+    Content-Length: 317
+    Content-Type: application/json; charset=utf-8
+    Date: Sun, 14 Dec 2014 00:44:29 GMT
+    Server: Jetty(7.6.8.v20121106)
+
+    {
+        "items": [
+            {
+                "_id": "548cdd3ed282a2a47b2492a9",
+                "name": "Kino"
+            },
+            {
+                "_id": "548cdd54d282a2a47b2492ab",
+                "name": "Boxen"
+            },
+            {
+                "_id": "548cdd64d282a2a47b2492ae",
+                "name": "Billard"
+            }
+        ]
+    }
+
+
 ## API Ideas
 
     POST /tastes -> neue Vorliebe anlegen 

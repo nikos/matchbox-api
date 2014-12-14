@@ -1,7 +1,7 @@
 (ns matchbox.services.recommender
-  (:import (org.apache.mahout.cf.taste.impl.similarity PearsonCorrelationSimilarity))
   (:require clojure.string
-            [matchbox.config :refer [db-specification coll-ratings]])
+            [matchbox.config :refer [db-specification coll-ratings]]
+            [matchbox.models.user :as user])
   (:import org.apache.mahout.cf.taste.impl.model.mongodb.MongoDBDataModel
            org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity
            org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood
@@ -15,8 +15,7 @@
                      (db-specification :port)
                      (db-specification :database)
                      coll-ratings
-                     false false nil)                       ; manage finalRemove dateFormat
-  )
+                     false false nil))                      ; manage finalRemove dateFormat
 
 ;; TODO: make private
 (defn id-to-long
@@ -31,9 +30,6 @@
   (.fromLongToId model id))
 
 
-(defstruct recommend
-  :user-id :object-id)
-
 (defn find-similar-users
   "For n most similar users to given user-id."
   [n user-id]
@@ -44,11 +40,9 @@
         long-id (id-to-long model user-id)
         similar-users (.mostSimilarUserIDs recommender long-id n)]
 
-    ;; translate LongIds as returned by Mahout into MongoDB ObjectID
+    ;; translate LongIds as returned by Mahout, into users by using MongoDB's ObjectID
     (map (fn [user-id]
-           (struct-map recommend
-             :user-id user-id
-             :object-id (long-to-id model user-id)))
+           (user/find-by-id (long-to-id model user-id)))
          similar-users)))
 
 
