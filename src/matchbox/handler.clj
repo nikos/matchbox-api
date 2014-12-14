@@ -14,14 +14,19 @@
 
 ;; -------------------------------------------------------
 
-;; lookup: (rating/find-by-id id)
-;; update-fn: (rating/update id doc)
-
-(defn generic-update [lookup update-fn]
+(defn generic-update [id doc lookup update-fn]
   (cond
     (empty? lookup) (not-found "Object does not exist")
-    :else (do (update-fn)
+    :else (do (update-fn id doc)
               (response "OK"))))
+
+(defn generic-delete [id lookup delete-fn]
+  (cond
+    (empty? lookup) (not-found "Object does not exist")
+    :else (do (delete-fn id)
+              (response "OK"))))
+
+;; -------------------------------------------------------
 
 (defn get-all-ratings []
   (response {:ratings (rating/all)}))
@@ -33,18 +38,12 @@
   (response (rating/create doc)))
 
 (defn update-rating [id doc]
-  (let [rating (rating/find-by-id id)]
-    (cond
-      (empty? rating) (not-found "Rating does not exist")
-      :else (do (rating/update id doc)
-                (response "OK")))))
+  (generic-update id doc (rating/find-by-id id)
+                  (fn [id doc] (rating/update id doc))))
 
 (defn delete-rating [id]
-  (let [rating (rating/find-by-id id)]
-    (cond
-      (empty? rating) (not-found "Rating does not exist")
-      :else (do (rating/delete id)
-                (response "OK")))))
+  (generic-delete id (rating/find-by-id id)
+                  (fn [id] (rating/delete id))))
 
 ;; -------------------------------------------------------
 
@@ -58,18 +57,12 @@
   (response (user/create doc)))
 
 (defn update-user [id doc]
-  (let [user (user/find-by-id id)]
-    (cond
-      (empty? user) (not-found "User does not exist")
-      :else (do (user/update id doc)
-                (response "OK")))))
+  (generic-update id doc (user/find-by-id id)
+                  (fn [id doc] (user/update id doc))))
 
 (defn delete-user [id]
-  (let [user (user/find-by-id id)]
-    (cond
-      (empty? user) (not-found "User does not exist")
-      :else (do (user/delete id)
-                (response "OK")))))
+  (generic-delete id (user/find-by-id id)
+                  (fn [id] (user/delete id))))
 
 (defn get-similar-users
   "Looks up similar users via mahout recommendation"

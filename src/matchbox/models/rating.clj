@@ -12,7 +12,8 @@
 
 (defn create [rating]
   (let [now (Date.)
-        timestamp (.getTime now)]
+        ;; MongoDB timestamps are only second precise
+        timestamp (Math/round (double (/ (.getTime now) 1000)))]
     (coll/insert-and-return db coll-ratings (assoc rating :created_at timestamp))))
 
 (defn update [id rating]

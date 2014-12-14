@@ -14,7 +14,7 @@
   (MongoDBDataModel. (db-specification :servername)
                      (db-specification :port)
                      (db-specification :database)
-                     (coll-ratings)
+                     coll-ratings
                      false false nil)                       ; manage finalRemove dateFormat
   )
 
