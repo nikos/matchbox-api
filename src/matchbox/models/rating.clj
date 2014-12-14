@@ -14,6 +14,9 @@
 (defn all []
   (coll/find-maps db coll-ratings))
 
+(defn find-by-user-id [user-id]
+  (coll/find-maps db coll-ratings {:user_id user-id} ["item_id" "preference" "created_at"]))
+
 (defn find-by-id [id]
   (coll/find-one-as-map db coll-ratings {:_id (ObjectId. id)}))
 

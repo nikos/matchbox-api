@@ -47,12 +47,19 @@
   (response {:rating (rating/find-by-id id)}))
 
 (defn create-new-rating [doc]
-  (try
-    (let [validated-doc (s/validate rating/Rating doc)
-          new-rating (rating/create validated-doc)]
-      (created (str "/ratings/" (new-rating :_id)) new-rating))
-    (catch Exception e
-      (client-error (str "Problem occurred: " e)))))        ;; TODO return e as map?
+  (let [existing-user (user/find-by-id (doc :user_id))
+        existing-item (item/find-by-id (doc :item_id))]
+    (cond
+      (empty? existing-user)
+      (client-error "Given User does not exist")
+      (empty? existing-item)
+      (client-error "Given Item does not exist")
+      :else (try
+              (let [validated-doc (s/validate rating/Rating doc)
+                    new-rating (rating/create validated-doc)]
+                (created (str "/ratings/" (new-rating :_id)) new-rating))
+              (catch Exception e
+                (client-error (str "Problem occurred: " e))))))) ;; TODO return e as map?
 
 (defn update-rating [id doc]
   (generic-update id doc (rating/find-by-id id)
@@ -69,6 +76,9 @@
 
 (defn get-user [id]
   (response {:user (user/find-by-id id)}))
+
+(defn get-user-ratings [id]
+  (response {:ratings (rating/find-by-user-id id)}))
 
 (defn create-new-user [doc]
   (let [existing-user (user/find-by-alias (doc :alias))]    ;; Avoid duplicates by alias
@@ -148,6 +158,7 @@
                                (GET "/" [] (get-all-users))
                                (POST "/" {body :body} (create-new-user body))
                                (context "/:id" [id] (defroutes user-routes
+                                                               (GET "/ratings" [] (get-user-ratings id))
                                                                (GET "/similar-users" [] (get-similar-users id))
                                                                (GET "/" [] (get-user id))
                                                                (PUT "/" {body :body} (update-user id body))
