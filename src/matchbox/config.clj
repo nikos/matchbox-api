@@ -14,6 +14,7 @@
 
 (def coll-ratings "ratings")
 (def coll-users "users")
+(def coll-items "items")
 
 ;; TODO also include connection parameters configurable
 (def db

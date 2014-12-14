@@ -6,8 +6,9 @@
             [compojure.route :as route]
             [monger.json]
             [matchbox.services.recommender :as recommender]
-            [matchbox.models.rating :as rating]
             [matchbox.models.user :as user]
+            [matchbox.models.item :as item]
+            [matchbox.models.rating :as rating]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
             [ring.util.response :refer [response not-found]]))
@@ -69,6 +70,26 @@
   [user-id]
   (response {:recommended (recommender/find-similar-users 3 user-id)}))
 
+;; -------------------------------------------------------
+
+(defn get-all-items []
+  (response {:items (item/all)}))
+
+(defn get-item [id]
+  (response {:item (item/find-by-id id)}))
+
+(defn create-new-item [doc]
+  (response (item/create doc)))
+
+(defn update-item [id doc]
+  (generic-update id doc (item/find-by-id id)
+                  (fn [id doc] (item/update id doc))))
+
+(defn delete-item [id]
+  (generic-delete id (item/find-by-id id)
+                  (fn [id] (item/delete id))))
+
+;; -------------------------------------------------------
 
 (defroutes app-routes
 
@@ -84,6 +105,14 @@
                                                                (PUT "/" {body :body} (update-user id body))
                                                                (DELETE "/" [] (delete-user id))))))
 
+           (context "/items" []
+                    (defroutes items-routes
+                               (GET "/" [] (get-all-items))
+                               (POST "/" {body :body} (create-new-item body))
+                               (context "/:id" [id] (defroutes item-routes
+                                                               (GET "/" [] (get-item id))
+                                                               (PUT "/" {body :body} (update-item id body))
+                                                               (DELETE "/" [] (delete-item id))))))
            (context "/ratings" []
                     (defroutes ratings-routes
                                (GET "/" [] (get-all-ratings))
