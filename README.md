@@ -23,32 +23,9 @@ Under Mac OSX install by using `brew install mongo` and then start with the help
 
 ## Manage items
 
-http -v POST http://nava.de:3000/items/ name=Billard
-POST /items/ HTTP/1.1
-Accept: application/json
-Accept-Encoding: gzip, deflate
-Connection: keep-alive
-Content-Length: 19
-Content-Type: application/json; charset=utf-8
-Host: nava.de:3000
-User-Agent: HTTPie/0.8.0
+    http POST http://matchbox.nava.de:3000/items/ name=Billard
 
-{
-    "name": "Billard"
-}
-
-HTTP/1.1 200 OK
-Content-Length: 51
-Content-Type: application/json; charset=utf-8
-Date: Sun, 14 Dec 2014 00:44:20 GMT
-Server: Jetty(7.6.8.v20121106)
-
-{
-    "_id": "548cdd64d282a2a47b2492ae",
-    "name": "Billard"
-}
-
-    http http://nava.de:3000/items/
+    http GET http://matchbox.nava.de:3000/items/
 
 Leads to the following sample result:
 
@@ -75,16 +52,97 @@ Leads to the following sample result:
         ]
     }
 
+## Manage users
+
+Create a new user
+
+    http POST http://matchbox.nava.de:3000/users/ alias=rocko first_name=Rocko  last_name=Schamoni
+
+Get all users:
+
+    http GET http://matchbox.nava.de:3000/users
+
+    {
+        "users": [
+            {
+                "_id": "548dbf1bd2829fb7bf535bbf",
+                "alias": "heinz",
+                "first_name": "heinz",
+                "last_name": "Strunk"
+            },
+            {
+                "_id": "548dbf49d2829fb7bf535bc0",
+                "alias": "rocko",
+                "first_name": "Rocko",
+                "last_name": "Schamoni"
+            },
+            {
+                "_id": "548dbf5fd2829fb7bf535bc1",
+                "alias": "jac",
+                "first_name": "Jacques",
+                "last_name": "Palminger"
+            }
+        ]
+    }
+
+## Ratings
+
+Add a new rating:
+
+    http POST http://matchbox.nava.de:3000/ratings/ item_id=548cdd3ed282a2a47b2492a9 user_id=548dbf1bd2829fb7bf535bbf preference:=1.0
+
+    HTTP/1.1 201 Created
+    Content-Length: 149
+    Content-Type: application/json; charset=utf-8
+    Date: Sun, 14 Dec 2014 16:54:00 GMT
+    Location: /ratings/548dc0a8d2829fb7bf535bc2
+    Server: Jetty(7.6.8.v20121106)
+
+    {
+        "_id": "548dc0a8d2829fb7bf535bc2",
+        "created_at": 1418576041,
+        "item_id": "548cdd3ed282a2a47b2492a9",
+        "preference": 1.0,
+        "user_id": "548dbf1bd2829fb7bf535bbf"
+    }
+
+
+Get all ratings
+
+    http GET http://matchbox.nava.de:3000/ratings
+
+
+Get similar users
+
+    http GET http://matchbox.nava.de:3000/users/548dbf49d2829fb7bf535bc0/similar-users
+
+    HTTP/1.1 200 OK
+    Content-Length: 110
+    Content-Type: application/json; charset=utf-8
+    Date: Sun, 14 Dec 2014 17:01:10 GMT
+    Server: Jetty(7.6.8.v20121106)
+
+    {
+        "recommended": [
+            {
+                "_id": "548dbf1bd2829fb7bf535bbf",
+                "alias": "heinz",
+                "first_name": "heinz",
+                "last_name": "Strunk"
+            }
+        ]
+    }
+
 
 ## API Ideas
 
-    POST /tastes -> neue Vorliebe anlegen 
-    GET /tastes -> liefert alle vorhandenen Vorlieben zurück
+    POST /ratings -> neue Vorliebe anlegen 
+    GET /ratings -> liefert alle vorhandenen Vorlieben zurück
 
     POST /users   -> neuen User anlegen
     GET /users/<userid> -> liefert User zurück, inkl. seiner Vorlieben
-    POST /users/<userid>/tastes  -> hinzufügen einer neuen Vorliebe
-    DELETE /users/<userid>/tastes/<taste-id> -> löscht eine Vorliebe
+    POST /users/<userid>/ratings  -> hinzufügen einer neuen Vorliebe
+    DELETE /users/<userid>/ratings/<taste-id> -> löscht eine Vorliebe
 
     GET /users/<userid>/similar-users  -> liefert eine Liste mit Usern, die ähnliche Vorlieben haben
 
