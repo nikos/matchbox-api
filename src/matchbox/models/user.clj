@@ -4,7 +4,7 @@
             [matchbox.config :refer [db coll-users]]
             [schema.core :as s]))
 
-(def User {:alias                       String
+(def User {:alias                       String              ;; must be unique
            :first_name                  String
            :last_name                   String
            (s/optional-key :_id)        String

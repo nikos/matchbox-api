@@ -71,12 +71,16 @@
   (response {:user (user/find-by-id id)}))
 
 (defn create-new-user [doc]
-  (try
-    (let [validated-doc (s/validate user/User doc)
-          new-user (user/create validated-doc)]
-      (created (str "/users/" (new-user :_id)) new-user))
-    (catch Exception e
-      (client-error (str "Problem occurred: " e)))))        ;; TODO return e as map?
+  (let [existing-user (user/find-by-alias (doc :alias))]    ;; Avoid duplicates by alias
+    (cond
+      (empty? existing-user)
+      (try
+        (let [validated-doc (s/validate user/User doc)
+              new-user (user/create validated-doc)]
+          (created (str "/users/" (new-user :_id)) new-user))
+        (catch Exception e
+          (client-error (str "Problem occurred: " e))))     ;; TODO return e as map?
+      :else (client-error "User with this alias already exists"))))
 
 (defn update-user [id doc]
   (generic-update id doc (user/find-by-id id)
@@ -100,12 +104,16 @@
   (response {:item (item/find-by-id id)}))
 
 (defn create-new-item [doc]
-  (try
-    (let [validated-doc (s/validate item/Item doc)
-          new-item (item/create validated-doc)]
-      (created (str "/items/" (new-item :_id)) new-item))
-    (catch Exception e
-      (client-error (str "Problem occurred: " e)))))        ;; TODO return e as map?
+  (let [existing-user (item/find-by-name (doc :name))]      ;; Avoid duplicates by name
+    (cond
+      (empty? existing-user)
+      (try
+        (let [validated-doc (s/validate item/Item doc)
+              new-item (item/create validated-doc)]
+          (created (str "/items/" (new-item :_id)) new-item))
+        (catch Exception e
+          (client-error (str "Problem occurred: " e))))     ;; TODO return e as map?
+      :else (client-error "Item with this name already exists"))))
 
 (defn update-item [id doc]
   (generic-update id doc (item/find-by-id id)

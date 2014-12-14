@@ -4,7 +4,7 @@
             [matchbox.config :refer [db coll-items]]
             [schema.core :as s]))
 
-(def Item {:name                        String
+(def Item {:name                        String              ;; must be unique
            (s/optional-key :_id)        String
            (s/optional-key :created_at) Number})
 
@@ -13,6 +13,9 @@
 
 (defn find-by-id [id]
   (coll/find-one-as-map db coll-items {:_id (ObjectId. id)}))
+
+(defn find-by-name [name]
+  (coll/find-one-as-map db coll-items {:name name}))
 
 (defn create [item]
   (coll/insert-and-return db coll-items item))
