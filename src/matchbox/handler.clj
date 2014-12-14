@@ -104,9 +104,9 @@
   (response {:item (item/find-by-id id)}))
 
 (defn create-new-item [doc]
-  (let [existing-user (item/find-by-name (doc :name))]      ;; Avoid duplicates by name
+  (let [existing-item (item/find-by-name (doc :name))]      ;; Avoid duplicates by name
     (cond
-      (empty? existing-user)
+      (empty? existing-item)
       (try
         (let [validated-doc (s/validate item/Item doc)
               new-item (item/create validated-doc)]
