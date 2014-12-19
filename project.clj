@@ -11,9 +11,9 @@
                  [com.novemberain/monger "2.0.1"]
                  [prismatic/schema "0.3.3"]
                  [compojure "1.3.1"]
-                 [ring.middleware.logger "0.5.0"]
+                 [ring/ring-json "0.3.1"]
                  [ring/ring-defaults "0.1.2"]
-                 [ring/ring-json "0.3.1"]]
+                 [ring.middleware.logger "0.5.0"]]
   :plugins [[lein-ring "0.8.13"]]
 
   :ring {:handler matchbox.handler/app}

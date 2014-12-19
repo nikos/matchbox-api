@@ -12,7 +12,7 @@
             [matchbox.models.rating :as rating]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
-            [ring.util.response :refer [response created not-found]]
+            [ring.util.response :refer [not-found]]
             [schema.core :as s]))
 
 ;; -------------------------------------------------------
@@ -24,27 +24,44 @@
    :headers {}
    :body    body})
 
+(defn response-ok
+  "Returns a skeletal Ring response with the given body, status of 200, and no
+  headers."
+  [body]
+  {:status  200
+   :headers { "Access-Control-Allow-Origin" "*" }
+   :body    body})
+
+(defn created-ok
+  "Returns a Ring response for a HTTP 201 created response."
+  {:added "1.2"}
+  ([url] (created-ok url nil))
+  ([url body]
+    {:status  201
+     :headers {"Location" url
+               "Access-Control-Allow-Origin" "*"}
+     :body    body}))
 ;; -------------------------------------------------------
 
 (defn generic-update [id doc lookup update-fn]
   (cond
     (empty? lookup) (not-found "Object does not exist")
     :else (do (update-fn id doc)
-              (response "OK"))))
+              (response-ok "OK"))))
 
 (defn generic-delete [id lookup delete-fn]
   (cond
     (empty? lookup) (not-found "Object does not exist")
     :else (do (delete-fn id)
-              (response "OK"))))
+              (response-ok "OK"))))
 
 ;; -------------------------------------------------------
 
 (defn get-all-ratings []
-  (response {:ratings (rating/all)}))
+  (response-ok {:ratings (rating/all)}))
 
 (defn get-rating [id]
-  (response {:rating (rating/find-by-id id)}))
+  (response-ok {:rating (rating/find-by-id id)}))
 
 (defn create-new-rating [doc]
   (let [existing-user (user/find-by-id (doc :user_id))
@@ -57,7 +74,7 @@
       :else (try
               (let [validated-doc (s/validate rating/Rating doc)
                     new-rating (rating/create validated-doc)]
-                (created (str "/ratings/" (new-rating :_id)) new-rating))
+                (created-ok (str "/ratings/" (new-rating :_id)) new-rating))
               (catch Exception e
                 (client-error (str "Problem occurred: " e))))))) ;; TODO return e as map?
 
@@ -72,13 +89,13 @@
 ;; -------------------------------------------------------
 
 (defn get-all-users []
-  (response {:users (user/all)}))
+  (response-ok {:users (user/all)}))
 
 (defn get-user [id]
-  (response {:user (user/find-by-id id)}))
+  (response-ok {:user (user/find-by-id id)}))
 
 (defn get-user-ratings [id]
-  (response {:ratings (rating/find-by-user-id id)}))
+  (response-ok {:ratings (rating/find-by-user-id id)}))
 
 (defn create-new-user [doc]
   (let [existing-user (user/find-by-alias (doc :alias))]    ;; Avoid duplicates by alias
@@ -87,7 +104,7 @@
       (try
         (let [validated-doc (s/validate user/User doc)
               new-user (user/create validated-doc)]
-          (created (str "/users/" (new-user :_id)) new-user))
+          (created-ok (str "/users/" (new-user :_id)) new-user))
         (catch Exception e
           (client-error (str "Problem occurred: " e))))     ;; TODO return e as map?
       :else (client-error "User with this alias already exists"))))
@@ -103,15 +120,15 @@
 (defn get-similar-users
   "Looks up similar users via mahout recommendation"
   [user-id]
-  (response {:recommended (recommender/find-similar-users 3 user-id)}))
+  (response-ok {:recommended (recommender/find-similar-users 3 user-id)}))
 
 ;; -------------------------------------------------------
 
 (defn get-all-items []
-  (response {:items (item/all)}))
+  (response-ok {:items (item/all)}))
 
 (defn get-item [id]
-  (response {:item (item/find-by-id id)}))
+  (response-ok {:item (item/find-by-id id)}))
 
 (defn create-new-item [doc]
   (let [existing-item (item/find-by-name (doc :name))]      ;; Avoid duplicates by name
@@ -120,7 +137,7 @@
       (try
         (let [validated-doc (s/validate item/Item doc)
               new-item (item/create validated-doc)]
-          (created (str "/items/" (new-item :_id)) new-item))
+          (created-ok (str "/items/" (new-item :_id)) new-item))
         (catch Exception e
           (client-error (str "Problem occurred: " e))))     ;; TODO return e as map?
       :else (client-error "Item with this name already exists"))))
@@ -144,7 +161,7 @@
 
              (println (str user-id "," user-interest "," (rand))))))
   (println (str n "," k))
-  (response "ok"))
+  (response-ok "OK"))
 
 ;; -------------------------------------------------------
 
