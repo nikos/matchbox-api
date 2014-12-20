@@ -29,7 +29,7 @@
   headers."
   [body]
   {:status  200
-   :headers { "Access-Control-Allow-Origin" "*" }
+   :headers {"Access-Control-Allow-Origin" "*"}
    :body    body})
 
 (defn created-ok
@@ -38,7 +38,7 @@
   ([url] (created-ok url nil))
   ([url body]
     {:status  201
-     :headers {"Location" url
+     :headers {"Location"                    url
                "Access-Control-Allow-Origin" "*"}
      :body    body}))
 ;; -------------------------------------------------------
@@ -63,17 +63,26 @@
 (defn get-rating [id]
   (response-ok {:rating (rating/find-by-id id)}))
 
-(defn create-new-rating [doc]
-  (let [existing-user (user/find-by-id (doc :user_id))
-        existing-item (item/find-by-id (doc :item_id))]
+(defn prepare-rating
+  [params body]
+  (let [user-id (or (:user_id params) (:user_id body))
+        item-id (or (:item_id params) (:item_id body))
+        pref-float (or (:preference params) (:preference body))]
+    {:user_id user-id :item_id item-id :preference pref-float}))
+
+(defn create-new-rating
+  "Adds new rating in the database (incl. validation)"
+  [raw-rating]
+  (let [existing-user (user/find-by-id (raw-rating :user_id))
+        existing-item (item/find-by-id (raw-rating :item_id))]
     (cond
       (empty? existing-user)
       (client-error "Given User does not exist")
       (empty? existing-item)
       (client-error "Given Item does not exist")
       :else (try
-              (let [validated-doc (s/validate rating/Rating doc)
-                    new-rating (rating/create validated-doc)]
+              (let [validated-rating (s/validate rating/Rating raw-rating)
+                    new-rating (rating/create validated-rating)]
                 (created-ok (str "/ratings/" (new-rating :_id)) new-rating))
               (catch Exception e
                 (client-error (str "Problem occurred: " e))))))) ;; TODO return e as map?
@@ -97,13 +106,22 @@
 (defn get-user-ratings [id]
   (response-ok {:ratings (rating/find-by-user-id id)}))
 
-(defn create-new-user [doc]
-  (let [existing-user (user/find-by-alias (doc :alias))]    ;; Avoid duplicates by alias
+(defn prepare-user
+  [params body]
+  (let [user-short (or (:alias params) (:alias body))
+        user-first (or (:first_name params) (:first_name body))
+        user-last (or (:last_name params) (:last_name body))]
+    {:alias user-short :first_name user-first :last_name user-last}))
+
+(defn create-new-user
+  "Creates new user in the database (incl. validation)"
+  [raw-user]
+  (let [existing-user (user/find-by-alias (raw-user :alias))]    ;; Avoid duplicates by alias
     (cond
       (empty? existing-user)
       (try
-        (let [validated-doc (s/validate user/User doc)
-              new-user (user/create validated-doc)]
+        (let [validated-user (s/validate user/User raw-user)
+              new-user (user/create validated-user)]
           (created-ok (str "/users/" (new-user :_id)) new-user))
         (catch Exception e
           (client-error (str "Problem occurred: " e))))     ;; TODO return e as map?
@@ -130,13 +148,20 @@
 (defn get-item [id]
   (response-ok {:item (item/find-by-id id)}))
 
-(defn create-new-item [doc]
-  (let [existing-item (item/find-by-name (doc :name))]      ;; Avoid duplicates by name
+(defn prepare-item
+  [params body]
+  (let [name (or (:name params) (:name body))]
+    {:name name}))
+
+(defn create-new-item
+  "Creates new item in the database (incl. validation)"
+  [raw-item]
+  (let [existing-item (item/find-by-name (raw-item :name))]      ;; Avoid duplicates by name
     (cond
       (empty? existing-item)
       (try
-        (let [validated-doc (s/validate item/Item doc)
-              new-item (item/create validated-doc)]
+        (let [validated-item (s/validate item/Item raw-item)
+              new-item (item/create validated-item)]
           (created-ok (str "/items/" (new-item :_id)) new-item))
         (catch Exception e
           (client-error (str "Problem occurred: " e))))     ;; TODO return e as map?
@@ -173,7 +198,7 @@
            (context "/users" []
                     (defroutes users-routes
                                (GET "/" [] (get-all-users))
-                               (POST "/" {body :body} (create-new-user body))
+                               (POST "/" {params :params body :body} (create-new-user (prepare-user params body)))
                                (context "/:id" [id] (defroutes user-routes
                                                                (GET "/ratings" [] (get-user-ratings id))
                                                                (GET "/similar-users" [] (get-similar-users id))
@@ -184,7 +209,7 @@
            (context "/items" []
                     (defroutes items-routes
                                (GET "/" [] (get-all-items))
-                               (POST "/" {body :body} (create-new-item body))
+                               (POST "/" {params :params body :body} (create-new-item (prepare-item params body)))
                                (context "/:id" [id] (defroutes item-routes
                                                                (GET "/" [] (get-item id))
                                                                (PUT "/" {body :body} (update-item id body))
@@ -192,7 +217,7 @@
            (context "/ratings" []
                     (defroutes ratings-routes
                                (GET "/" [] (get-all-ratings))
-                               (POST "/" {body :body} (create-new-rating body))
+                               (POST "/" {params :params body :body} (create-new-rating (prepare-rating params body)))
                                (context "/:id" [id] (defroutes rating-routes
                                                                (GET "/" [] (get-rating id))
                                                                (PUT "/" {body :body} (update-rating id body))
