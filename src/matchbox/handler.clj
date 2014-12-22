@@ -29,7 +29,8 @@
   headers."
   [body]
   {:status  200
-   :headers {"Access-Control-Allow-Origin" "*"}
+   :headers {"Access-Control-Allow-Origin" "*"
+             "Access-Control-Request-Methods" "GET,POST,PUT"}
    :body    body})
 
 (defn created-ok
@@ -39,7 +40,8 @@
   ([url body]
     {:status  201
      :headers {"Location"                    url
-               "Access-Control-Allow-Origin" "*"}
+               "Access-Control-Allow-Origin" "*"
+               "Access-Control-Request-Methods" "GET,POST,PUT"}
      :body    body}))
 ;; -------------------------------------------------------
 
