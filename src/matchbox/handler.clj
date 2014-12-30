@@ -69,8 +69,8 @@
   [params body]
   (let [user-id (or (:user_id params) (:user_id body))
         item-id (or (:item_id params) (:item_id body))
-        pref-float (or (:preference params) (:preference body))]
-    {:user_id user-id :item_id item-id :preference pref-float}))
+        pref-double (or (Double/parseDouble (:preference params)) (:preference body))]
+    {:user_id user-id :item_id item-id :preference pref-double}))
 
 (defn create-new-rating
   "Adds new rating in the database (incl. validation)"
