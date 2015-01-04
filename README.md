@@ -142,12 +142,12 @@ Get similar users
     POST /users   -> neuen User anlegen
     GET /users/<userid> -> liefert User zurück, inkl. seiner Vorlieben
     POST /users/<userid>/ratings  -> hinzufügen einer neuen Vorliebe
-    DELETE /users/<userid>/ratings/<taste-id> -> löscht eine Vorliebe
+    DELETE /users/<userid>/ratings/<rating-id> -> löscht eine Vorliebe
 
     GET /users/<userid>/similar-users  -> liefert eine Liste mit Usern, die ähnliche Vorlieben haben
 
 
-JSON für taste:
+JSON für rating:
 
     {
       "id": "vom-Server-vergeben",
@@ -157,3 +157,9 @@ JSON für taste:
         "ru": "фильмкинолента"
       }
     }
+
+
+## Inspirations
+
+Recommender (user/item) system using Mahout and MongoDB, wrapped by a REST service.
+https://github.com/nellaivijay/Mahout-MongoDB-Recommender

@@ -22,7 +22,6 @@
     <orderEntry type="library" name="Leiningen: org.clojure/clojure:1.6.0" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/tools.nrepl:0.2.3" level="project" />
     <orderEntry type="library" name="Leiningen: prismatic/schema:0.3.3" level="project" />
-    <orderEntry type="library" name="Leiningen: ring-cors:0.1.4" level="project" />
     <orderEntry type="library" name="Leiningen: ring-mock:0.1.5" level="project" />
     <orderEntry type="library" name="Leiningen: ring.middleware.logger:0.5.0" level="project" />
     <orderEntry type="library" name="Leiningen: ring/ring-defaults:0.1.2" level="project" />

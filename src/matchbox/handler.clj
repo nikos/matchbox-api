@@ -59,6 +59,7 @@
 
 ;; -------------------------------------------------------
 
+;; TODO: Limit to the newest N ratings (aka rating feed)
 (defn get-all-ratings []
   (response-ok {:ratings (rating/all)}))
 
