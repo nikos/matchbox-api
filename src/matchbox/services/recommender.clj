@@ -14,8 +14,10 @@
   (MongoDBDataModel. (db-specification :servername)
                      (db-specification :port)
                      (db-specification :database)
-                     coll-ratings
-                     false false nil))                      ; manage finalRemove dateFormat
+                     coll-ratings                           ; collection name
+                     false false nil                        ; manage finalRemove dateFormat
+                     "user._id" "item._id" "preference"     ; column names for recommendations
+                     "mongo_data_model_map"))               ; mapping collection name
 
 ;; TODO: make private
 (defn id-to-long

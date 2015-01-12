@@ -84,7 +84,7 @@
       (empty? existing-item)
       (client-error "Given Item does not exist")
       :else (try
-              (let [validated-rating (s/validate rating/Rating raw-rating)
+              (let [validated-rating (s/validate rating/NewRating raw-rating)
                     new-rating (rating/create validated-rating)]
                 (created-ok (str "/ratings/" (new-rating :_id)) new-rating))
               (catch Exception e
@@ -123,7 +123,7 @@
     (cond
       (empty? existing-user)
       (try
-        (let [validated-user (s/validate user/User raw-user)
+        (let [validated-user (s/validate user/NewUser raw-user)
               new-user (user/create validated-user)]
           (created-ok (str "/users/" (new-user :_id)) new-user))
         (catch Exception e
@@ -163,7 +163,7 @@
     (cond
       (empty? existing-item)
       (try
-        (let [validated-item (s/validate item/Item raw-item)
+        (let [validated-item (s/validate item/NewItem raw-item)
               new-item (item/create validated-item)]
           (created-ok (str "/items/" (new-item :_id)) new-item))
         (catch Exception e

@@ -4,9 +4,16 @@
             [matchbox.config :refer [db coll-items]]
             [schema.core :as s]))
 
-(def Item {:name                        String              ;; must be unique
-           (s/optional-key :_id)        String
-           (s/optional-key :created_at) Number})
+;; -------------------------------------------------------------
+;; Schema (used for validation of new objects)
+
+(s/defschema Item {:_id                         String
+                   :name                        String      ;; must be unique
+                   (s/optional-key :created_at) Number})
+
+(s/defschema NewItem (dissoc Item :_id :created_at))
+
+;; -------------------------------------------------------------
 
 (defn all []
   (coll/find-maps db coll-items))
