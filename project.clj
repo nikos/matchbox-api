@@ -12,9 +12,9 @@
                  [prismatic/schema "0.3.3"]
                  [compojure "1.3.1"]
                  [ring/ring-json "0.3.1"]
-                 [ring/ring-defaults "0.1.2"]
+                 [ring/ring-defaults "0.1.3"]
                  [ring.middleware.logger "0.5.0"]]
-  :plugins [[lein-ring "0.8.13"]]
+  :plugins [[lein-ring "0.9.0"]]
 
   :ring {:handler matchbox.handler/app}
 
