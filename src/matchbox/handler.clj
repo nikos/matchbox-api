@@ -149,7 +149,10 @@
   (response-ok {:items (item/all)}))
 
 (defn get-item [id]
-  (response-ok {:item (item/find-by-id id)}))
+  (let [item (item/find-by-id id)]
+    (cond
+      (empty? item) (not-found "Item does not exist")
+      :else (response-ok {:item item}))))
 
 (defn prepare-item
   [params body]

@@ -42,14 +42,28 @@
 (defn delete [id]
   (coll/remove-by-id db coll-ratings (ObjectId. id)))
 
+(defn delete-all []
+  (coll/remove db coll-ratings))
 
-;; Data
+
+
+;; Populate Initial Data
+
+(delete-all)
 
 ;;(when (empty? (seq all))
-  (create {:item       {:name "Harribo Frutti"}
-           :user       {:alias "nikos" :first_name "Niko" :last_name "Schmuck"}
+(def nikos (matchbox.models.user/create {:alias "nikos" :first_name "Niko" :last_name "Schmuck"}))
+(def i1 (matchbox.models.item/create {:name "Harribo Frutti"}))
+(def i2 (matchbox.models.item/create {:name "Norwegen"}))
+
+  (create {:item       i1
+           :item_id    (get i1 :_id)
+           :user       nikos
+           :user_id    (get nikos :_id)
            :preference 1.0})
-  (create {:item       {:name "Norwegen"}
-           :user       {:alias "nikos" :first_name "Niko" :last_name "Schmuck"}
+  (create {:item       i2
+           :item_id    (get i2 :_id)
+           :user       nikos
+           :user_id    (get nikos :_id)
            :preference 1.0})
 ;;)

@@ -16,7 +16,7 @@
                      (db-specification :database)
                      coll-ratings                           ; collection name
                      false false nil                        ; manage finalRemove dateFormat
-                     "user._id" "item._id" "preference"     ; column names for recommendations
+                     "user_id" "item_id" "preference"       ; column names for recommendations
                      "mongo_data_model_map"))               ; mapping collection name
 
 ;; TODO: make private
