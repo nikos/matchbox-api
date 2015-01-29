@@ -22,6 +22,9 @@
 (defn all []
   (coll/find-maps db coll-ratings))
 
+(defn total []
+  (coll/count db coll-ratings))
+
 (defn find-by-user-id [user-id]
   (coll/find-maps db coll-ratings {:user_id user-id} ["item" "user" "preference" "created_at"]))
 
@@ -49,21 +52,30 @@
 
 ;; Populate Initial Data
 
-(delete-all)
+(comment (delete-all))
+
+(defn init-db []
+  (let [nikos (matchbox.models.user/create {:alias "nikos" :first_name "Niko" :last_name "Schmuck"})
+        i1 (matchbox.models.item/create {:name "Harribo Frutti"})
+        i2 (matchbox.models.item/create {:name "Norwegen"})]
+    (create {:item       i1
+             :item_id    (get i1 :_id)
+             :user       nikos
+             :user_id    (get nikos :_id)
+             :preference 1.0})
+    (create {:item       i2
+             :item_id    (get i2 :_id)
+             :user       nikos
+             :user_id    (get nikos :_id)
+             :preference 1.0})))
+
+
+(if (= total 0)
+  (do
+    (println "*** No ratings found")
+    (init-db))
+  (do
+    (println "---> Some ratings found")))
 
 ;;(when (empty? (seq all))
-(def nikos (matchbox.models.user/create {:alias "nikos" :first_name "Niko" :last_name "Schmuck"}))
-(def i1 (matchbox.models.item/create {:name "Harribo Frutti"}))
-(def i2 (matchbox.models.item/create {:name "Norwegen"}))
-
-  (create {:item       i1
-           :item_id    (get i1 :_id)
-           :user       nikos
-           :user_id    (get nikos :_id)
-           :preference 1.0})
-  (create {:item       i2
-           :item_id    (get i2 :_id)
-           :user       nikos
-           :user_id    (get nikos :_id)
-           :preference 1.0})
 ;;)
