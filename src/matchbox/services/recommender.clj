@@ -15,9 +15,9 @@
                      (db-specification :port)
                      (db-specification :database)
                      coll-ratings                           ; collection name
-                     false false nil                        ; manage finalRemove dateFormat
-                     "user_id" "item_id" "preference"       ; column names for recommendations
-                     "mongo_data_model_map"))               ; mapping collection name
+                     false false nil))                        ; manage finalRemove dateFormat
+                     ;;"user_id" "item_id" "preference"       ; column names for recommendations
+                     ;;"mongo_data_model_map"))               ; mapping collection name
 
 ;; TODO: make private
 (defn id-to-long
@@ -33,7 +33,7 @@
 
 
 (defn find-similar-users
-  "For n most similar users to given user-id."
+  "Returns n most similar users compared to given user-id."
   [n user-id]
   (let [model (get-datamodel)
         similarity (PearsonCorrelationSimilarity. model)
@@ -43,6 +43,7 @@
         similar-users (.mostSimilarUserIDs recommender long-id n)]
 
     ;; translate LongIds as returned by Mahout, into users by using MongoDB's ObjectID
+    (println "-- similar users:" (count similar-users))
     (map (fn [user-id]
            (user/find-by-id (long-to-id model user-id)))
          similar-users)))

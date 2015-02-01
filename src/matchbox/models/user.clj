@@ -36,3 +36,6 @@
 
 (defn delete [id]
   (coll/remove-by-id db coll-users (ObjectId. id)))
+
+(defn delete-all []
+  (coll/remove db coll-users))

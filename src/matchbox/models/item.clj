@@ -32,3 +32,7 @@
 
 (defn delete [id]
   (coll/remove-by-id db coll-items (ObjectId. id)))
+
+(defn delete-all []
+  (coll/remove db coll-items))
+
