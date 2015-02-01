@@ -1,7 +1,9 @@
 (ns matchbox.models.rating
+  (:refer-clojure :exclude [sort find])
   (:import (org.bson.types ObjectId)
            (java.util Date))
   (:require [monger.collection :as coll]
+            [monger.query :refer :all]
             [matchbox.config :refer [db coll-ratings]]
             [schema.core :as s]))
 
@@ -10,9 +12,12 @@
 ;; Schema (used for validation of new objects)
 
 (s/defschema Rating {:_id                         String
+                     :item_id                     String
                      :item                        matchbox.models.item/Item
+                     :user_id                     String
                      :user                        matchbox.models.user/User
                      :preference                  double
+                     (s/optional-key :sentiment)  String
                      (s/optional-key :created_at) Number})
 
 (s/defschema NewRating (dissoc Rating :_id :created_at))
@@ -21,12 +26,22 @@
 
 (defn all []
   (coll/find-maps db coll-ratings))
+  ;TODO: limit and sort
+  ;(with-collection db coll-ratings
+  ;                 (find {})
+  ;                 (fields [:score :name])
+  ;                 ;; it is VERY IMPORTANT to use array maps with sort
+  ;                 (sort (array-map :score -1 :name 1))
+  ;                 (limit 10)))
+
+
+;;(coll/find-maps db coll-ratings))
 
 (defn total []
   (coll/count db coll-ratings))
 
 (defn find-by-user-id [user-id]
-  (coll/find-maps db coll-ratings {:user_id user-id} ["item" "user" "preference" "created_at"]))
+  (coll/find-maps db coll-ratings {:user_id user-id} ["item" "item_id" "user" "user_id" "preference" "sentiment" "created_at"]))
 
 (defn find-by-id [id]
   (coll/find-one-as-map db coll-ratings {:_id (ObjectId. id)}))
@@ -49,10 +64,10 @@
   (coll/remove db coll-ratings))
 
 
+
+
 ;; ========================================================================
 ;; Populate Initial Data
-
-(comment (delete-all))
 
 (defn init-db []
   (let [p1 (matchbox.models.user/create {:alias "wino" :first_name "Wino" :last_name "Voltari"})

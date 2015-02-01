@@ -3,12 +3,13 @@
   (:use compojure.core)
   (:use cheshire.core)
   (:use ring.util.response)
-  (:require [compojure.handler :as handler]
+  (:require [matchbox.services.recommender :as recommender]
+            [compojure.handler :as handler]
             [compojure.route :as route]
             [monger.json]
-            [matchbox.services.recommender :as recommender]
             [matchbox.models.user :as user]
             [matchbox.models.item :as item]
+            [matchbox.models.sentiment :as sentiment]
             [matchbox.models.rating :as rating]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
@@ -56,6 +57,39 @@
     (empty? lookup) (not-found "Object does not exist")
     :else (do (delete-fn id)
               (response-ok "OK"))))
+
+;; -------------------------------------------------------
+
+;; TODO: Limit to the newest N sentiments (aka sentiment feed)
+(defn get-all-sentiments []
+  (response-ok {:sentiments (sentiment/all)}))
+
+(defn get-sentiment [id]
+  (response-ok {:sentiment (sentiment/find-by-id id)}))
+
+(defn prepare-sentiment
+  [params body]
+  (let [user-id (or (:user_id params) (:user_id body))
+        sentence (or (:sentence params) (:sentence body))]
+    {:user_id user-id :sentence sentence}))
+
+(defn create-new-sentiment
+  "Adds new sentiment in the database (incl. validation)"
+  [raw-sentiment]
+  (let [existing-user (user/find-by-id (raw-sentiment :user_id))]
+    (cond
+      (empty? existing-user)
+      (client-error "Given User does not exist")
+      :else (try
+              (let [validated-sentiment (s/validate sentiment/NewSentiment raw-sentiment)
+                    new-sentiment (sentiment/create validated-sentiment)]
+                (created-ok (str "/sentiments/" (new-sentiment :_id)) new-sentiment))
+              (catch Exception e
+                (client-error (str "Problem occurred: " e))))))) ;; TODO return e as map?
+
+(defn delete-sentiment [id]
+  (generic-delete id (sentiment/find-by-id id)
+                  (fn [id] (sentiment/delete id))))
 
 ;; -------------------------------------------------------
 
@@ -211,7 +245,6 @@
                                                                (GET "/" [] (get-user id))
                                                                (PUT "/" {body :body} (update-user id body))
                                                                (DELETE "/" [] (delete-user id))))))
-
            (context "/items" []
                     (defroutes items-routes
                                (GET "/" [] (get-all-items))
@@ -228,7 +261,13 @@
                                                                (GET "/" [] (get-rating id))
                                                                (PUT "/" {body :body} (update-rating id body))
                                                                (DELETE "/" [] (delete-rating id))))))
-
+           (context "/sentiments" []
+                    (defroutes sentiments-routes
+                               (GET "/" [] (get-all-sentiments))
+                               (POST "/" {params :params body :body} (create-new-sentiment (prepare-sentiment params body)))
+                               (context "/:id" [id] (defroutes sentiment-routes
+                                                               (GET "/" [] (get-sentiment id))
+                                                               (DELETE "/" [] (delete-sentiment id))))))
            (route/not-found "Not Found"))
 
 
