@@ -17,7 +17,7 @@
                  ;; Natural Language Processing
                  [clojure-opennlp "0.3.3"]  ;; uses Opennlp 1.5.3
                  [clojure-stemmer "0.1.0"]
-                 [cheshire "4.0.0"]
+                 [cheshire "5.3.1"]
 
                  ;; schema validation
                  [prismatic/schema "0.3.3"]
