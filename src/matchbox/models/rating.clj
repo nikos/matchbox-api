@@ -168,10 +168,10 @@
     (init-db))
   (do
     (println "---> Some ratings found")
-    (matchbox.models.user/delete-all)
-    (matchbox.models.item/delete-all)
-    (delete-all)
-    (init-db)
+    ;(matchbox.models.user/delete-all)
+    ;(matchbox.models.item/delete-all)
+    ;(delete-all)
+    ;(init-db)
     ))
 
 ;;(when (empty? (seq all))
