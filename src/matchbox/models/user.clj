@@ -7,7 +7,7 @@
 ;; -------------------------------------------------------------
 ;; Schema (used for validation of new objects)
 
-(s/defschema User {:_id                         String
+(s/defschema User {:_id                         ObjectId
                    :alias                       String      ;; must be unique
                    :first_name                  String
                    :last_name                   String

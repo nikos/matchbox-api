@@ -7,7 +7,7 @@
 ;; -------------------------------------------------------------
 ;; Schema (used for validation of new objects)
 
-(s/defschema Item {:_id                         String
+(s/defschema Item {:_id                         ObjectId
                    :name                        String      ;; must be unique (avoid duplicates to ensure recommendation correctness)
                    (s/optional-key :created_at) Number})
 

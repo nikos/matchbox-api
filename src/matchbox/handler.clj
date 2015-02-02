@@ -74,14 +74,15 @@
     {:user_id user-id :sentence sentence}))
 
 (defn create-new-sentiment
-  "Adds new sentiment in the database (incl. validation)"
+  "Adds new sentiment in the database (incl. validation), resolves user by their given ID"
   [raw-sentiment]
   (let [existing-user (user/find-by-id (raw-sentiment :user_id))]
     (cond
       (empty? existing-user)
       (client-error "Given User does not exist")
       :else (try
-              (let [validated-sentiment (s/validate sentiment/NewSentiment raw-sentiment)
+              (let [sentiment (assoc raw-sentiment :user existing-user)
+                    validated-sentiment (s/validate sentiment/NewSentiment sentiment)
                     new-sentiment (sentiment/create validated-sentiment)]
                 (created-ok (str "/sentiments/" (new-sentiment :_id)) new-sentiment))
               (catch Exception e
@@ -108,7 +109,7 @@
     {:user_id user-id :item_id item-id :preference pref-double}))
 
 (defn create-new-rating
-  "Adds new rating in the database (incl. validation)"
+  "Adds new rating in the database (incl. validation), resolves user and item by their given IDs"
   [raw-rating]
   (let [existing-user (user/find-by-id (raw-rating :user_id))
         existing-item (item/find-by-id (raw-rating :item_id))]
@@ -118,7 +119,8 @@
       (empty? existing-item)
       (client-error "Given Item does not exist")
       :else (try
-              (let [validated-rating (s/validate rating/NewRating raw-rating)
+              (let [rating (assoc raw-rating :user existing-user :item existing-item)
+                    validated-rating (s/validate rating/NewRating rating)
                     new-rating (rating/create validated-rating)]
                 (created-ok (str "/ratings/" (new-rating :_id)) new-rating))
               (catch Exception e

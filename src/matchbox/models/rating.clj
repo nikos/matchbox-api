@@ -11,7 +11,7 @@
 ;; ------------------------------------------------------------------------
 ;; Schema (used for validation of new objects)
 
-(s/defschema Rating {:_id                         String
+(s/defschema Rating {:_id                         ObjectId
                      :item_id                     String
                      :item                        matchbox.models.item/Item
                      :user_id                     String

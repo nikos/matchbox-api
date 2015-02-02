@@ -13,10 +13,11 @@
 ;; -------------------------------------------------------------
 ;; Schema (used for validation of new objects)
 
-(s/defschema Sentiment {:_id                         String
+(s/defschema Sentiment {:_id                         ObjectId
                         :sentence                    String
                         :user_id                     String
                         :user                        matchbox.models.user/User
+                        (s/optional-key :ratings)    [matchbox.models.rating/Rating]
                         (s/optional-key :created_at) Number})
 
 (s/defschema NewSentiment (dissoc Sentiment :_id :created_at))
