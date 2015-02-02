@@ -1,14 +1,9 @@
 (ns matchbox.models.sentiment
   (:import (org.bson.types ObjectId))
   (:require [monger.collection :as coll]
-            [opennlp.nlp :refer [make-tokenizer make-pos-tagger]]
+            [sentimental.core :as sent]
             [matchbox.config :refer [db coll-sentiments]]
             [schema.core :as s]))
-
-;; -------------------------------------------------------
-;; Initialize NLP with english vocabulary
-(defonce tokenize (make-tokenizer "models/en-token.bin"))
-(defonce pos-tag (make-pos-tagger "models/en-pos-maxent.bin"))
 
 ;; -------------------------------------------------------------
 ;; Schema (used for validation of new objects)
@@ -31,7 +26,7 @@
   (coll/find-one-as-map db coll-sentiments {:_id (ObjectId. id)}))
 
 (defn create [sentiment]
-  (clojure.pprint/pprint (pos-tag (tokenize (:sentence sentiment))))
+  (clojure.pprint/pprint (sent/pos-tag (sent/tokenize (:sentence sentiment))))
   (coll/insert-and-return db coll-sentiments sentiment))
 
 (defn delete [id]
@@ -39,4 +34,3 @@
 
 (defn delete-all []
   (coll/remove db coll-sentiments))
-
