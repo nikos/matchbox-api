@@ -14,6 +14,24 @@
 ; the actual categorizer
 (def categorize (make-document-categorizer tr/senti-model))
 
+;; -------------------------------------------------------
+
+(defn get-nouns-tuples
+  "Returns the nouns tuples from the tokenized list"
+  [tok-sentence]
+  (filter (fn [x] (.startsWith (nth x 1) "NN")) tok-sentence))
+
+(defn get-nouns
+  "Returns a list of nouns"
+  [tok-sentence]
+  (map (fn [x] (nth x 0))
+       (get-nouns-tuples tok-sentence)))
+
+(defn get-stemmed-nouns
+  [tok-sentence]
+  (map (fn [x] (stemmer/stemming x))
+       (get-nouns tok-sentence)))
+
 (defn stop-words []
   (set (sentimental.train/get-lines "resources/stop_words.txt")))
 

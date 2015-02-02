@@ -11,6 +11,7 @@
             [matchbox.models.item :as item]
             [matchbox.models.sentiment :as sentiment]
             [matchbox.models.rating :as rating]
+            [sentimental.core :as sent]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
             [ring.util.response :refer [not-found]]
@@ -72,6 +73,14 @@
   (let [user-id (or (:user_id params) (:user_id body))
         sentence (or (:sentence params) (:sentence body))]
     {:user_id user-id :sentence sentence}))
+
+(defn analyze-sentiment
+  "Analyzes sentiment to allow to test outcome"
+  [raw-sentiment]
+  (let [tok-sentence (sent/pos-tag (sent/tokenize (:sentence raw-sentiment)))
+        nouns (sent/get-stemmed-nouns tok-sentence)
+        categorization (sent/categorize (:sentence raw-sentiment))]
+    (response-ok {:sentence (:sentence raw-sentiment) :nouns nouns :categorization (:best-category categorization)})))
 
 (defn create-new-sentiment
   "Adds new sentiment in the database (incl. validation), resolves user by their given ID"
@@ -266,6 +275,7 @@
            (context "/sentiments" []
                     (defroutes sentiments-routes
                                (GET "/" [] (get-all-sentiments))
+                               (POST "/analyze" {params :params body :body} (analyze-sentiment (prepare-sentiment params body)))
                                (POST "/" {params :params body :body} (create-new-sentiment (prepare-sentiment params body)))
                                (context "/:id" [id] (defroutes sentiment-routes
                                                                (GET "/" [] (get-sentiment id))
