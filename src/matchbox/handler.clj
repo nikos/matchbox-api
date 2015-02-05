@@ -77,35 +77,41 @@
 (defn analyze-sentiment
   "Analyzes sentiment of a given sentence to allow easier testing quality"
   [raw-sentiment]
-  (let [user (user/find-by-id (:user_id raw-sentiment))
-        sentence (:sentence raw-sentiment)
+  (let [sentence (:sentence raw-sentiment)
         tok-sentence (sent/pos-tag (sent/tokenize sentence))
         nouns (sent/extract-single-and-double-nouns tok-sentence)
         negatives (sent/grab-negative-tuples tok-sentence)
-        category (sent/categorize sentence negatives)
-        preference (sent/category2preference category)
-        ;; TODO create also sentiment
-        ratings (for [n nouns
-                      :let [item (item/get-or-create {:name n})]]
-                  (rating/create {:item item :item_id (item :_id) :user user :user_id (user :_id) :sentiment sentence :preference preference}))]
+        category (sent/categorize sentence negatives)]
     (response-ok {:sentence sentence
                   :tokens tok-sentence
                   :nouns nouns
-                  :category category
-                  :ratings ratings})))
+                  :category category})))
 
 (defn create-new-sentiment
-  "Adds new sentiment in the database (incl. validation), resolves user by their given ID"
+  "Adds new sentiment in the database analyze and also create ratings on-the-fly, resolves user by their given ID"
   [raw-sentiment]
-  (let [existing-user (user/find-by-id (raw-sentiment :user_id))]
+  (let [user (user/find-by-id (raw-sentiment :user_id))]
     (cond
-      (empty? existing-user)
+      (empty? user)
       (client-error "Given User does not exist")
       :else (try
-              (let [sentiment (assoc raw-sentiment :user existing-user)
+              (let [;; ~~ (A) analyze sentence and categorize sentiment
+                    sentence (:sentence raw-sentiment)
+                    tok-sentence (sent/pos-tag (sent/tokenize sentence))
+                    nouns (sent/extract-single-and-double-nouns tok-sentence)
+                    negatives (sent/grab-negative-tuples tok-sentence)
+                    category (sent/categorize sentence negatives)
+                    preference (sent/category2preference category)
+                    ;; ~~ (B) create new sentiment
+                    sentiment (assoc raw-sentiment :user user)
                     validated-sentiment (s/validate sentiment/NewSentiment sentiment)
-                    new-sentiment (sentiment/create validated-sentiment)]
-                (created-ok (str "/sentiments/" (new-sentiment :_id)) new-sentiment))
+                    new-sentiment (sentiment/create validated-sentiment)
+                    ;; ~~ (C) create ratings
+                    ratings (for [n nouns
+                                  :let [item (item/get-or-create {:name n})]]
+                              (rating/create {:item item :item_id (item :_id) :user user :user_id (user :_id) :sentiment sentence :preference preference}))
+                    compl-sentiment (assoc new-sentiment :ratings ratings)]
+                (created-ok (str "/sentiments/" (compl-sentiment :_id)) compl-sentiment))
               (catch Exception e
                 (client-error (str "Problem occurred: " e))))))) ;; TODO return e as map?
 

@@ -134,6 +134,96 @@ Get similar users
     }
 
 
+## Sentiments
+
+Analyze a sentence and rate a sentiment.
+
+Current mapping is:
+
+  * strong negative: -5
+  * weak negative: -2
+  * neutral: 0
+  * weak positive: +2
+  * strong positive: +5
+
+Example for creating a new sentiment:
+
+    http -v POST localhost:3000/sentiments sentence="I do not like George Clooney and don't like rain." user_id=54cf2fdb0364fac8bb99c08b
+    POST /sentiments HTTP/1.1
+    Accept: application/json
+    Accept-Encoding: gzip, deflate
+    Connection: keep-alive
+    Content-Length: 104
+    Content-Type: application/json; charset=utf-8
+    Host: localhost:3000
+    User-Agent: HTTPie/0.8.0
+
+    {
+        "sentence": "I do not like George Clooney and don't like rain.",
+        "user_id": "54cf2fdb0364fac8bb99c08b"
+    }
+
+    HTTP/1.1 201 Created
+    Access-Control-Allow-Origin: *
+    Access-Control-Request-Methods: GET,POST,PUT
+    Content-Length: 1022
+    Content-Type: application/json; charset=utf-8
+    Date: Thu, 05 Feb 2015 11:28:33 GMT
+    Location: /sentiments/54d353e10364f68ce067ae77
+    Server: Jetty(7.6.13.v20130916)
+
+    {
+        "_id": "54d353e10364f68ce067ae77",
+        "ratings": [
+            {
+                "_id": "54d353e10364f68ce067ae78",
+                "created_at": 1423135714,
+                "item": {
+                    "_id": "54d34e1d0364862278b2778b",
+                    "name": "rain"
+                },
+                "item_id": "54d34e1d0364862278b2778b",
+                "preference": -5.0,
+                "sentiment": "I do not like George Clooney and don't like rain.",
+                "user": {
+                    "_id": "54cf2fdb0364fac8bb99c08b",
+                    "alias": "werner",
+                    "first_name": "Werner",
+                    "last_name": "Schneeberger"
+                },
+                "user_id": "54cf2fdb0364fac8bb99c08b"
+            },
+            {
+                "_id": "54d353e10364f68ce067ae79",
+                "created_at": 1423135714,
+                "item": {
+                    "_id": "54d34e1d0364862278b2778d",
+                    "name": "George Clooney"
+                },
+                "item_id": "54d34e1d0364862278b2778d",
+                "preference": -5.0,
+                "sentiment": "I do not like George Clooney and don't like rain.",
+                "user": {
+                    "_id": "54cf2fdb0364fac8bb99c08b",
+                    "alias": "werner",
+                    "first_name": "Werner",
+                    "last_name": "Schneeberger"
+                },
+                "user_id": "54cf2fdb0364fac8bb99c08b"
+            }
+        ],
+        "sentence": "I do not like George Clooney and don't like rain.",
+        "user": {
+            "_id": "54cf2fdb0364fac8bb99c08b",
+            "alias": "werner",
+            "first_name": "Werner",
+            "last_name": "Schneeberger"
+        },
+        "user_id": "54cf2fdb0364fac8bb99c08b"
+    }
+
+
+
 ## API Ideas
 
     POST /ratings -> neue Vorliebe anlegen 
