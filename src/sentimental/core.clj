@@ -69,14 +69,14 @@
 ;; ---
 
 (defn extract-single-and-double-nouns
-  "PUBLIC: Overall method first stemming, extracting single and double nouns"
+  "PUBLIC: Returns list of nouns from OpenNLP array,
+   Combines stemming, extracting single and double nouns"
   [arr]
   (let [stemmed-arr (stem-nouns arr)
         single-nouns (grab-nouns stemmed-arr)
         double-nouns (remove nil? (grab-double-nouns stemmed-arr))
         reduced-single-nouns (reduce-singles single-nouns double-nouns)]
-    reduced-single-nouns)
-  )
+    (flatten (conj double-nouns reduced-single-nouns))))
 
 
 ;; -------------------------------------------------------

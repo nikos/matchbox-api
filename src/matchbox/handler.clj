@@ -77,15 +77,16 @@
 (defn analyze-sentiment
   "Analyzes sentiment to allow testing quality of outcome"
   [raw-sentiment]
-  (let [tok-sentence (sent/pos-tag (sent/tokenize (:sentence raw-sentiment)))
+  (let [sentence (:sentence raw-sentiment)
+        tok-sentence (sent/pos-tag (sent/tokenize sentence))
         nouns (sent/get-stemmed-nouns tok-sentence)
-        categorization (sent/categorize (:sentence raw-sentiment))]
+        categorization (sent/categorize sentence)]
     (clojure.pprint/pprint tok-sentence)
     ;; TODO: do not stemm NNP / NNPS !!
     ;; TODO: if NN* behind each other combine them to one
     (response-ok {:tokens tok-sentence
-                  :sentence (:sentence raw-sentiment)
-                  :nouns nouns
+                  :sentence sentence
+                  :nouns (sent/extract-single-and-double-nouns tok-sentence)
                   :categorization (:best-category categorization)})))
 
 (defn create-new-sentiment
