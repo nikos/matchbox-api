@@ -12,35 +12,40 @@
 (defonce detokenize (make-detokenizer "models/english-detokenizer.xml"))
 (defonce pos-tag (make-pos-tagger "models/en-pos-maxent.bin"))
 
-; the actual categorizer
+;; the actual categorizer (using OpenNLP)
 (def categorize (make-document-categorizer tr/senti-model))
-
 ;; -------------------------------------------------------
 
-; TODO need to stem
+;; (1)
+(defn stem-nouns
+  "Takes the original categorization list and if any singular nouns (=NN) stem them"
+  [arr]
+  (map (fn [x]
+         (if (= (nth x 1) "NN")
+           (vector (stemmer/stemming (nth x 0)) (nth x 1))
+           (vector (nth x 0) (nth x 1))))
+       arr))
 
-(map (fn [x]
-       (vector (stemmer/stemming (nth x 0)) (nth x 1))) arr)
-
+;; NN    Noun, singular or mass
+;; NNP   Proper noun, singular
+;; NNPS  Proper noun, plural
+;; NNS   Noun, plural
 
 (defn grab-noun-tuples
-  "Returns the tuples, which are nouns"
+  "Returns the array elements, which are all kind of nouns"
   [arr]
   (filter (fn [x]
             (.startsWith (nth x 1) "NN")) arr))
-(grab-noun-tuples arr)
 
 (defn grab-nouns
-  "Out of the tuples only return a list of nouns"
+  "Flatten the array elements in a simple list of nouns"
   [arr]
-  (map #(first %)
-       (filter (fn [x]
-                 (.startsWith (nth x 1) "NN")) arr)))
-(grab-nouns arr)
-(def my-singles (grab-nouns arr))
+  (map #(first %) (grab-noun-tuples arr)))
 
 (defn grab-double-nouns
+  "Group nouns in pairs, if they directly occur after each other"
   [arr]
+  ;; TODO can possibly improved to not make use of for loop?
   (for [i (range 0 (- (count arr) 1))]
     (let [curr-type (nth (nth arr i) 1)
           curr-val (nth (nth arr i) 0)
@@ -48,22 +53,30 @@
           nxt-val (nth (nth arr (+ i 1)) 0)]
       (if
         (and
-          (= curr-type "NN")
-          (= nxt-type "NN"))
-        (str curr-val " " nxt-val)
-        ))))
-(grab-double-nouns arr)
-(def my-doubles (remove nil? (grab-double-nouns arr)))
+          (.startsWith curr-type "NN")
+          (.startsWith nxt-type "NN"))
+        (str curr-val " " nxt-val)))))
 
 (defn reduce-singles
+  "Returns a simple list of single nouns which are not part of the grouped pairs"
   [single-nouns double-nouns]
-  (filter  #((comp not contains?)
-             (set (mapcat (fn[s]
-                            (str/split s #" "))
-                          double-nouns)) %)
-           single-nouns))
+  (filter #((comp not contains?)
+            (set (mapcat (fn [s]
+                           (str/split s #" "))
+                         double-nouns)) %)
+          single-nouns))
 
-(reduce-singles my-singles my-doubles)
+;; ---
+
+(defn extract-single-and-double-nouns
+  "PUBLIC: Overall method first stemming, extracting single and double nouns"
+  [arr]
+  (let [stemmed-arr (stem-nouns arr)
+        single-nouns (grab-nouns stemmed-arr)
+        double-nouns (remove nil? (grab-double-nouns stemmed-arr))
+        reduced-single-nouns (reduce-singles single-nouns double-nouns)]
+    reduced-single-nouns)
+  )
 
 
 ;; -------------------------------------------------------
