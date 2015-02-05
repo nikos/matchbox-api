@@ -12,11 +12,24 @@
 (defonce detokenize (make-detokenizer "models/english-detokenizer.xml"))
 (defonce pos-tag (make-pos-tagger "models/en-pos-maxent.bin"))
 
-;; the actual categorizer (using OpenNLP)
-(def categorize (make-document-categorizer tr/senti-model))
+;; the actual categorizer function (using OpenNLP)
+(def raw-categorize (make-document-categorizer tr/senti-model))
+
+(defn categorize
+  [sentence negatives]
+  (let [categorization (raw-categorize sentence)
+        category (:best-category categorization)]
+    (if (not-empty negatives)
+      (str/replace category #"positive" "negative")
+      (category))))
+
 ;; -------------------------------------------------------
 
-;; (1)
+;; NN    Noun, singular or mass
+;; NNP   Proper noun, singular
+;; NNPS  Proper noun, plural
+;; NNS   Noun, plural
+
 (defn stem-nouns
   "Takes the original categorization list and if any singular nouns (=NN) stem them"
   [arr]
@@ -26,16 +39,21 @@
            (vector (nth x 0) (nth x 1))))
        arr))
 
-;; NN    Noun, singular or mass
-;; NNP   Proper noun, singular
-;; NNPS  Proper noun, plural
-;; NNS   Noun, plural
-
 (defn grab-noun-tuples
   "Returns the array elements, which are all kind of nouns"
   [arr]
   (filter (fn [x]
             (.startsWith (nth x 1) "NN")) arr))
+
+(defn grab-negative-tuples
+  "Returns the array elements, which are negative"
+  [arr]
+  (filter (fn [x]
+            (and
+              (or
+                (= (nth x 0) "n't")
+                (= (nth x 0) "not"))
+              (.startsWith (nth x 1) "RB"))) arr))
 
 (defn grab-nouns
   "Flatten the array elements in a simple list of nouns"
@@ -66,7 +84,7 @@
                          double-nouns)) %)
           single-nouns))
 
-;; ---
+;; ~~~~
 
 (defn extract-single-and-double-nouns
   "PUBLIC: Returns list of nouns from OpenNLP array,
@@ -78,24 +96,7 @@
         reduced-single-nouns (reduce-singles single-nouns double-nouns)]
     (flatten (conj double-nouns reduced-single-nouns))))
 
-
 ;; -------------------------------------------------------
-
-(defn get-nouns-tuples
-  "Returns the nouns tuples from the tokenized list"
-  [tok-sentence]
-  (filter (fn [x] (.startsWith (nth x 1) "NN")) tok-sentence))
-
-(defn get-nouns
-  "Returns a list of nouns"
-  [tok-sentence]
-  (map (fn [x] (nth x 0))
-       (get-nouns-tuples tok-sentence)))
-
-(defn get-stemmed-nouns
-  [tok-sentence]
-  (map (fn [x] (stemmer/stemming x))
-       (get-nouns tok-sentence)))
 
 (defn stop-words []
   (set (sentimental.train/get-lines "resources/stop_words.txt")))

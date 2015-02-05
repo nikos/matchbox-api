@@ -75,19 +75,17 @@
     {:user_id user-id :sentence sentence}))
 
 (defn analyze-sentiment
-  "Analyzes sentiment to allow testing quality of outcome"
+  "Analyzes sentiment of a given sentence to allow easier testing quality"
   [raw-sentiment]
   (let [sentence (:sentence raw-sentiment)
         tok-sentence (sent/pos-tag (sent/tokenize sentence))
-        nouns (sent/get-stemmed-nouns tok-sentence)
-        categorization (sent/categorize sentence)]
-    (clojure.pprint/pprint tok-sentence)
-    ;; TODO: do not stemm NNP / NNPS !!
-    ;; TODO: if NN* behind each other combine them to one
-    (response-ok {:tokens tok-sentence
-                  :sentence sentence
-                  :nouns (sent/extract-single-and-double-nouns tok-sentence)
-                  :categorization (:best-category categorization)})))
+        nouns (sent/extract-single-and-double-nouns tok-sentence)
+        negatives (sent/grab-negative-tuples tok-sentence)
+        category (sent/categorize sentence negatives)]
+    (response-ok {:sentence sentence
+                  :tokens tok-sentence
+                  :nouns nouns
+                  :category category})))
 
 (defn create-new-sentiment
   "Adds new sentiment in the database (incl. validation), resolves user by their given ID"
