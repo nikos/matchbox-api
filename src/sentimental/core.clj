@@ -23,6 +23,15 @@
       (str/replace category #"positive" "negative")
       (category))))
 
+(defn category2preference
+  [category]
+  (case category
+    "strongsubj-negative" -5.0
+    "weaksubj-negative" -2.0
+    "weaksubj-positive" 2.0
+    "strongsubj-positive" 5.0
+    0.0)) ;; default
+
 ;; -------------------------------------------------------
 
 ;; NN    Noun, singular or mass

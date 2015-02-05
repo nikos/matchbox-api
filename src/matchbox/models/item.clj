@@ -27,6 +27,12 @@
 (defn create [item]
   (coll/insert-and-return db coll-items item))
 
+(defn get-or-create [item]
+  (let [lookup (find-by-name (item :name))]
+    (if (nil? lookup)
+      (create item)
+      lookup)))
+
 (defn update [id item]
   (coll/update-by-id db coll-items (ObjectId. id) {:name (item :name)} {:multi false}))
 
@@ -35,4 +41,3 @@
 
 (defn delete-all []
   (coll/remove db coll-items))
-

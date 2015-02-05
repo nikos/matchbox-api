@@ -77,15 +77,22 @@
 (defn analyze-sentiment
   "Analyzes sentiment of a given sentence to allow easier testing quality"
   [raw-sentiment]
-  (let [sentence (:sentence raw-sentiment)
+  (let [user (user/find-by-id (:user_id raw-sentiment))
+        sentence (:sentence raw-sentiment)
         tok-sentence (sent/pos-tag (sent/tokenize sentence))
         nouns (sent/extract-single-and-double-nouns tok-sentence)
         negatives (sent/grab-negative-tuples tok-sentence)
-        category (sent/categorize sentence negatives)]
+        category (sent/categorize sentence negatives)
+        preference (sent/category2preference category)
+        ;; TODO create also sentiment
+        ratings (for [n nouns
+                      :let [item (item/get-or-create {:name n})]]
+                  (rating/create {:item item :item_id (item :_id) :user user :user_id (user :_id) :sentiment sentence :preference preference}))]
     (response-ok {:sentence sentence
                   :tokens tok-sentence
                   :nouns nouns
-                  :category category})))
+                  :category category
+                  :ratings ratings})))
 
 (defn create-new-sentiment
   "Adds new sentiment in the database (incl. validation), resolves user by their given ID"
