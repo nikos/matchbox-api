@@ -21,7 +21,7 @@
         category (:best-category categorization)]
     (if (not-empty negatives)
       (str/replace category #"positive" "negative")
-      (category))))
+      category)))
 
 (defn category2preference
   [category]
