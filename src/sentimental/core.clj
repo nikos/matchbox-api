@@ -1,5 +1,6 @@
 (ns sentimental.core
-  (:require [clojure-stemmer.porter.stemmer :as stemmer]
+  (:require [clojure.string :as str]
+            [clojure-stemmer.porter.stemmer :as stemmer]
             [sentimental.train :as tr])
   (:use [opennlp.nlp]
         [clojure.java.io]))
@@ -13,6 +14,57 @@
 
 ; the actual categorizer
 (def categorize (make-document-categorizer tr/senti-model))
+
+;; -------------------------------------------------------
+
+; TODO need to stem
+
+(map (fn [x]
+       (vector (stemmer/stemming (nth x 0)) (nth x 1))) arr)
+
+
+(defn grab-noun-tuples
+  "Returns the tuples, which are nouns"
+  [arr]
+  (filter (fn [x]
+            (.startsWith (nth x 1) "NN")) arr))
+(grab-noun-tuples arr)
+
+(defn grab-nouns
+  "Out of the tuples only return a list of nouns"
+  [arr]
+  (map #(first %)
+       (filter (fn [x]
+                 (.startsWith (nth x 1) "NN")) arr)))
+(grab-nouns arr)
+(def my-singles (grab-nouns arr))
+
+(defn grab-double-nouns
+  [arr]
+  (for [i (range 0 (- (count arr) 1))]
+    (let [curr-type (nth (nth arr i) 1)
+          curr-val (nth (nth arr i) 0)
+          nxt-type (nth (nth arr (+ i 1)) 1)
+          nxt-val (nth (nth arr (+ i 1)) 0)]
+      (if
+        (and
+          (= curr-type "NN")
+          (= nxt-type "NN"))
+        (str curr-val " " nxt-val)
+        ))))
+(grab-double-nouns arr)
+(def my-doubles (remove nil? (grab-double-nouns arr)))
+
+(defn reduce-singles
+  [single-nouns double-nouns]
+  (filter  #((comp not contains?)
+             (set (mapcat (fn[s]
+                            (str/split s #" "))
+                          double-nouns)) %)
+           single-nouns))
+
+(reduce-singles my-singles my-doubles)
+
 
 ;; -------------------------------------------------------
 
