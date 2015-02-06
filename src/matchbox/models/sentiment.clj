@@ -1,7 +1,7 @@
 (ns matchbox.models.sentiment
   (:import (org.bson.types ObjectId))
   (:require [monger.collection :as coll]
-            [sentimental.core :as sent]
+            [matchbox.services.sentiment-analyzer :as sent]
             [matchbox.config :refer [db coll-sentiments]]
             [schema.core :as s]))
 
@@ -12,7 +12,7 @@
                         :sentence                    String
                         :user_id                     String
                         :user                        matchbox.models.user/User
-                        (s/optional-key :ratings)    String ;matchbox.models.rating/Rating
+                        (s/optional-key :ratings)    String ;  TODO should array [matchbox.models.rating/Rating]
                         (s/optional-key :created_at) Number})
 
 (s/defschema NewSentiment (dissoc Sentiment :_id :created_at))

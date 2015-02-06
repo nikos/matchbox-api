@@ -1,7 +1,7 @@
-(ns sentimental.core
+(ns matchbox.services.sentiment-analyzer
   (:require [clojure.string :as str]
             [clojure-stemmer.porter.stemmer :as stemmer]
-            [sentimental.train :as tr])
+            [matchbox.services.sentiment-train :as tr])
   (:use [opennlp.nlp]
         [clojure.java.io]))
 
@@ -16,6 +16,7 @@
 (def raw-categorize (make-document-categorizer tr/senti-model))
 
 (defn categorize
+  "Categorize and post-process to overcome problem, if negative words combined this should leave to a negative category"
   [sentence negatives]
   (let [categorization (raw-categorize sentence)
         category (:best-category categorization)]
@@ -24,28 +25,36 @@
       category)))
 
 (defn category2preference
+  "Translates verbal categorization into numerical value"
   [category]
   (case category
     "strongsubj-negative" -5.0
     "weaksubj-negative" -2.0
     "weaksubj-positive" 2.0
     "strongsubj-positive" 5.0
-    0.0)) ;; default
+    0.0))                         ;; default == neutral
 
 ;; -------------------------------------------------------
 
-;; NN    Noun, singular or mass
-;; NNP   Proper noun, singular
-;; NNPS  Proper noun, plural
-;; NNS   Noun, plural
+;; NN     Noun, singular or mass
+;; NNS    Noun, plural
+;; NNP    Proper noun, singular (z.B. Eigennamen)
+;; NNPS   Proper noun, plural
+;; ~~
+;; VB     Verb, base form
+;; VBD    Verb, past tense
+;; VBG    Verb, gerund/present participle
+;; VBN    Verb, past participle
+;; VBP    Verb, non-3rd ps. sing. present
+;; VBZ    Verb, 3rd ps. sing. present
 
-(defn stem-nouns
-  "Takes the original categorization list and if any singular nouns (=NN) stem them"
+(defn stem-nouns  ;; TODO: not only nouns should be stemmed
+  "Takes the original categorization list and if any plural nouns (=NNS) found, stem them"
   [arr]
   (map (fn [x]
-         (if (= (nth x 1) "NN")
-           (vector (stemmer/stemming (nth x 0)) (nth x 1))
-           (vector (nth x 0) (nth x 1))))
+         (if (= (nth x 1) "NNS")
+           (vector (stemmer/stemming (nth x 0)) (nth x 1))    ;; stem first entry, leave type as it is
+           (vector (nth x 0) (nth x 1))))                     ;; use original form
        arr))
 
 (defn grab-noun-tuples
@@ -97,18 +106,17 @@
 
 (defn extract-single-and-double-nouns
   "PUBLIC: Returns list of nouns from OpenNLP array,
-   Combines stemming, extracting single and double nouns"
+   extracts single and double nouns"
   [arr]
-  (let [stemmed-arr (stem-nouns arr)
-        single-nouns (grab-nouns stemmed-arr)
-        double-nouns (remove nil? (grab-double-nouns stemmed-arr))
+  (let [single-nouns (grab-nouns arr)
+        double-nouns (remove nil? (grab-double-nouns arr))
         reduced-single-nouns (reduce-singles single-nouns double-nouns)]
     (flatten (conj double-nouns reduced-single-nouns))))
 
 ;; -------------------------------------------------------
 
 (defn stop-words []
-  (set (sentimental.train/get-lines "resources/stop_words.txt")))
+  (set (tr/get-lines "resources/stop_words.txt")))
 
 (defn strip-stop-words [l]
   (filter (fn [x] (not (contains? (stop-words) x)))

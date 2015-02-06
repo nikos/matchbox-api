@@ -1,5 +1,4 @@
 (ns matchbox.handler
-  (:import (clojure.lang ExceptionInfo))
   (:use compojure.core)
   (:use cheshire.core)
   (:use ring.util.response)
@@ -11,11 +10,12 @@
             [matchbox.models.item :as item]
             [matchbox.models.sentiment :as sentiment]
             [matchbox.models.rating :as rating]
-            [sentimental.core :as sent]
+            [matchbox.services.sentiment-analyzer :as sent]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
             [ring.util.response :refer [not-found]]
-            [schema.core :as s]))
+            [schema.core :as s]
+            [clojure.string :as str]))
 
 ;; -------------------------------------------------------
 
@@ -108,7 +108,7 @@
                     new-sentiment (sentiment/create validated-sentiment)
                     ;; ~~ (C) create ratings
                     ratings (for [n nouns
-                                  :let [item (item/get-or-create {:name n})]]
+                                  :let [item (item/get-or-create {:name n :normalized (str/lower-case n)})]] ;; TODO stem
                               (rating/create {:item item :item_id (item :_id) :user user :user_id (user :_id) :sentiment sentence :preference preference}))
                     compl-sentiment (assoc new-sentiment :ratings ratings)]
                 (created-ok (str "/sentiments/" (compl-sentiment :_id)) compl-sentiment))
@@ -220,12 +220,12 @@
 (defn prepare-item
   [params body]
   (let [name (or (:name params) (:name body))]
-    {:name name}))
+    {:name name :normalized (str/lower-case name)}))
 
 (defn create-new-item
   "Creates new item in the database (incl. validation)"
   [raw-item]
-  (let [existing-item (item/find-by-name (raw-item :name))]      ;; Avoid duplicates by name
+  (let [existing-item (item/find-by-normalized (raw-item :normalized))]      ;; Avoid duplicates by name
     (cond
       (empty? existing-item)
       (try

@@ -1,4 +1,4 @@
-(ns sentimental.train
+(ns matchbox.services.sentiment-train
   (:require [clojure.string :as string])
   (:use [opennlp.nlp]
         [opennlp.tools.train]
