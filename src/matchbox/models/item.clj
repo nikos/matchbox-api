@@ -1,20 +1,8 @@
 (ns matchbox.models.item
   (:import (org.bson.types ObjectId))
   (:require [monger.collection :as coll]
-            [matchbox.config :refer [db coll-items]]
-            [schema.core :as s]))
+            [matchbox.config :refer [db coll-items]]))
 
-;; -------------------------------------------------------------
-;; Schema (used for validation of new objects)
-
-(s/defschema Item {:_id                         ObjectId
-                   :normalized                  String   ;; must be unique (avoid duplicates to ensure recommendation correctness)
-                   :name                        String
-                   (s/optional-key :created_at) Number})
-
-(s/defschema NewItem (dissoc Item :_id :created_at))
-
-;; -------------------------------------------------------------
 
 (defn all []
   (coll/find-maps db coll-items))

@@ -1,4 +1,4 @@
-(ns matchbox.datagen
+(ns matchbox.utils.datagen
   (:require clojure.string))
 
 ;; replace (range 40) with this snippet for string interests:

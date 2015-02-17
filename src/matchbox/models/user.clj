@@ -4,18 +4,6 @@
             [matchbox.config :refer [db coll-users]]
             [schema.core :as s]))
 
-;; -------------------------------------------------------------
-;; Schema (used for validation of new objects)
-
-(s/defschema User {:_id                         ObjectId
-                   :alias                       String      ;; must be unique
-                   :first_name                  String
-                   :last_name                   String
-                   (s/optional-key :created_at) Number})
-
-(s/defschema NewUser (dissoc User :_id :created_at))
-
-;; -------------------------------------------------------------
 
 (defn all []
   (coll/find-maps db coll-users))

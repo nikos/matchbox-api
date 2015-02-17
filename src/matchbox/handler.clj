@@ -10,6 +10,7 @@
             [matchbox.models.item :as item]
             [matchbox.models.sentiment :as sentiment]
             [matchbox.models.rating :as rating]
+            [matchbox.models.schema :as schema]
             [matchbox.services.sentiment-analyzer :as sent]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
@@ -104,7 +105,7 @@
                     preference (sent/category2preference category)
                     ;; ~~ (B) create new sentiment
                     sentiment (assoc raw-sentiment :user user)
-                    validated-sentiment (s/validate sentiment/NewSentiment sentiment)
+                    validated-sentiment (s/validate schema/NewSentiment sentiment)
                     new-sentiment (sentiment/create validated-sentiment)
                     ;; ~~ (C) create ratings
                     ratings (for [n nouns
@@ -147,7 +148,7 @@
       (client-error "Given Item does not exist")
       :else (try
               (let [rating (assoc raw-rating :user existing-user :item existing-item)
-                    validated-rating (s/validate rating/NewRating rating)
+                    validated-rating (s/validate schema/NewRating rating)
                     new-rating (rating/create validated-rating)]
                 (created-ok (str "/ratings/" (new-rating :_id)) new-rating))
               (catch Exception e
@@ -186,7 +187,7 @@
     (cond
       (empty? existing-user)
       (try
-        (let [validated-user (s/validate user/NewUser raw-user)
+        (let [validated-user (s/validate schema/NewUser raw-user)
               new-user (user/create validated-user)]
           (created-ok (str "/users/" (new-user :_id)) new-user))
         (catch Exception e
@@ -229,7 +230,7 @@
     (cond
       (empty? existing-item)
       (try
-        (let [validated-item (s/validate item/NewItem raw-item)
+        (let [validated-item (s/validate schema/NewItem raw-item)
               new-item (item/create validated-item)]
           (created-ok (str "/items/" (new-item :_id)) new-item))
         (catch Exception e

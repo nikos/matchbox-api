@@ -4,25 +4,10 @@
            (java.util Date))
   (:require [monger.collection :as coll]
             [monger.query :refer :all]
-            [matchbox.config :refer [db coll-ratings]]
-            [schema.core :as s]))
+            [matchbox.models.user :as user]
+            [matchbox.models.item :as item]
+            [matchbox.config :refer [db coll-ratings]]))
 
-
-;; ------------------------------------------------------------------------
-;; Schema (used for validation of new objects)
-
-(s/defschema Rating {:_id                         ObjectId
-                     :item_id                     String
-                     :item                        matchbox.models.item/Item
-                     :user_id                     String
-                     :user                        matchbox.models.user/User
-                     :preference                  double
-                     (s/optional-key :sentiment)  String
-                     (s/optional-key :created_at) Number})
-
-(s/defschema NewRating (dissoc Rating :_id :created_at))
-
-;; ------------------------------------------------------------------------
 
 (defn all []
   (coll/find-maps db coll-ratings))
@@ -70,16 +55,16 @@
 ;; Populate Initial Data
 
 (defn init-db []
-  (let [p1 (matchbox.models.user/create {:alias "wino" :first_name "Wino" :last_name "Voltari"})
-        p2 (matchbox.models.user/create {:alias "frank" :first_name "Frank" :last_name "Wurzel"})
-        p3 (matchbox.models.user/create {:alias "birne" :first_name "Bernd" :last_name "Birne"})
-        p4 (matchbox.models.user/create {:alias "werner" :first_name "Werner" :last_name "Schneeberger"})
-        i1 (matchbox.models.item/create {:name "Wine"})
-        i2 (matchbox.models.item/create {:name "France"})
-        i3 (matchbox.models.item/create {:name "Apple"})
-        i4 (matchbox.models.item/create {:name "Snow"})
-        i5 (matchbox.models.item/create {:name "Sunshine"})
-        i6 (matchbox.models.item/create {:name "Norway"})]
+  (let [p1 (user/create {:alias "wino" :first_name "Wino" :last_name "Voltari"})
+        p2 (user/create {:alias "frank" :first_name "Frank" :last_name "Wurzel"})
+        p3 (user/create {:alias "birne" :first_name "Bernd" :last_name "Birne"})
+        p4 (user/create {:alias "werner" :first_name "Werner" :last_name "Schneeberger"})
+        i1 (item/create {:name "Wine"})
+        i2 (item/create {:name "France"})
+        i3 (item/create {:name "Apple"})
+        i4 (item/create {:name "Snow"})
+        i5 (item/create {:name "Sunshine"})
+        i6 (item/create {:name "Norway"})]
 
     (create {:item       i1
              :item_id    (str (get i1 :_id))

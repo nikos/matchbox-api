@@ -11,6 +11,10 @@ Example call:
     (use 'matchbox.services.recommender)
     (find-similar-users 7 3)
 
+To start running the tests and watch for updates use:
+
+    lein midje :autotest
+
 
 ## Requirements
 
