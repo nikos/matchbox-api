@@ -93,7 +93,7 @@
           (.startsWith nxt-type "NN"))
         (str curr-val " " nxt-val)))))
 
-(defn reduce-singles
+(defn- reduce-singles
   "Returns a simple list of single nouns which are not part of the grouped pairs"
   [single-nouns double-nouns]
   (filter #((comp not contains?)
@@ -105,7 +105,7 @@
 ;; ~~~~
 
 (defn extract-single-and-double-nouns
-  "PUBLIC: Returns list of nouns from OpenNLP array,
+  "Returns list of nouns from OpenNLP array,
    extracts single and double nouns"
   [arr]
   (let [single-nouns (grab-nouns arr)

@@ -82,11 +82,13 @@
         tok-sentence (sent/pos-tag (sent/tokenize sentence))
         nouns (sent/extract-single-and-double-nouns tok-sentence)
         negatives (sent/grab-negative-tuples tok-sentence)
-        category (sent/categorize sentence negatives)]
+        category (sent/categorize sentence negatives)
+        preference (sent/category2preference category)]
     (response-ok {:sentence sentence
                   :tokens tok-sentence
                   :nouns nouns
-                  :category category})))
+                  :category category
+                  :preference preference})))
 
 (defn create-new-sentiment
   "Adds new sentiment in the database analyze and also create ratings on-the-fly, resolves user by their given ID"
