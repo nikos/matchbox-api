@@ -192,7 +192,7 @@
           (created-ok (str "/users/" (new-user :_id)) new-user))
         (catch Exception e
           (client-error (str "Problem occurred: " e))))     ;; TODO return e as map?
-      :else (client-error "User with this alias already exists"))))
+      :else (client-error "User with this name already exists"))))
 
 (defn update-user [id doc]
   (generic-update id doc (user/find-by-id id)
