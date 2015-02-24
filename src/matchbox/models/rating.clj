@@ -55,10 +55,10 @@
 ;; Populate Initial Data
 
 (defn init-db []
-  (let [p1 (user/create {:alias "wino" :first_name "Wino" :last_name "Voltari"})
-        p2 (user/create {:alias "frank" :first_name "Frank" :last_name "Wurzel"})
-        p3 (user/create {:alias "birne" :first_name "Bernd" :last_name "Birne"})
-        p4 (user/create {:alias "werner" :first_name "Werner" :last_name "Schneeberger"})
+  (let [p1 (user/create {:profile {:name "Wino Voltari"}})
+        p2 (user/create {:profile {:name "Frank Wurzel"}})
+        p3 (user/create {:profile {:name "Bernd Birne"}})
+        p4 (user/create {:profile {:name "Werner Schneeberger"}})
         i1 (item/create {:name "Wine"})
         i2 (item/create {:name "France"})
         i3 (item/create {:name "Apple"})
@@ -153,10 +153,10 @@
     (init-db))
   (do
     (println "---> Some ratings found")
-    ;(matchbox.models.user/delete-all)
-    ;(matchbox.models.item/delete-all)
-    ;(delete-all)
-    ;(init-db)
+    (matchbox.models.user/delete-all)
+    (matchbox.models.item/delete-all)
+    (delete-all)
+    (init-db)
     ))
 
 ;;(when (empty? (seq all))

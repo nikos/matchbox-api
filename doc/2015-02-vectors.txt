@@ -1,0 +1,28 @@
+(defn compress "P08" [xs]
+  (reduce #(if (= (nth (last %1) 1) (nth %2 1))
+            %1
+            (concat %1 (list %2)))
+          '() xs))
+
+(compress (list ["San" "NNP"] ["Francisco" "NNP"] ["winter" "NN"]))
+
+;;==
+
+(defn compress
+  "Reduce an array to its minimu"
+  [xs]
+  (reduce #(if (= (nth (last %1) 1) (nth %2 1))
+            %1
+            (concat %1 (list %2)))
+          '() xs))
+
+(compress (list ["San" "NNP"] ["Francisco" "NNP"] ["winter" "NN"]))
+
+
+[0,1]
+
+(clojure.string/join (list "a" "b"))
+
+
+(type (vector 0 1 2))
+

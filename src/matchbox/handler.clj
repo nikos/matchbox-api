@@ -177,15 +177,13 @@
 
 (defn prepare-user
   [params body]
-  (let [user-short (or (:alias params) (:alias body))
-        user-first (or (:first_name params) (:first_name body))
-        user-last (or (:last_name params) (:last_name body))]
-    {:alias user-short :first_name user-first :last_name user-last}))
+  (let [user-name (or (:name (:profile params)) (:name (:profile body)))]
+    {:profile {:name user-name}}))
 
 (defn create-new-user
   "Creates new user in the database (incl. validation)"
   [raw-user]
-  (let [existing-user (user/find-by-alias (raw-user :alias))]    ;; Avoid duplicates by alias
+  (let [existing-user (user/find-by-name ((raw-user :profile) :name))]    ;; Avoid duplicates by name
     (cond
       (empty? existing-user)
       (try

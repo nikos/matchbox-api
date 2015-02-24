@@ -6,10 +6,12 @@
 ;; Schemas (used for validation of new objects)
 ;; -------------------------------------------------------------
 
+(s/defschema Profile {:name        String
+                      :picture     String
+                      :initialized boolean})
+
 (s/defschema User {:_id                         ObjectId
-                   :alias                       String      ;; must be unique
-                   :first_name                  String
-                   :last_name                   String
+                   :profile                     Profile
                    (s/optional-key :created_at) Number})
 
 (s/defschema NewUser (dissoc User :_id :created_at))
@@ -17,7 +19,7 @@
 ;; -------------------------------------------------------------
 
 (s/defschema Item {:_id                         ObjectId
-                   :normalized                  String   ;; must be unique (avoid duplicates to ensure recommendation correctness)
+                   :normalized                  String      ;; must be unique (avoid duplicates to ensure recommendation correctness)
                    :name                        String
                    (s/optional-key :created_at) Number})
 

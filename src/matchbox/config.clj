@@ -2,11 +2,11 @@
   (:require [monger.core :as mongo]))
 
 
-(def mongo-host     (or (System/getenv "MONGO_HOST") "localhost"))
-(def mongo-port     (Integer/parseInt (or (System/getenv "MONGO_PORT") "27017")))
-(def mongo-db       (or (System/getenv "MONGO_DB") "matchbox"))
-(def mongo-user     (or (System/getenv "MONGO_USER") "niko"))
-(def mongo-password (or (System/getenv "MONGO_PW") ""))
+(defonce mongo-host     (or (System/getenv "MONGO_HOST") "localhost"))
+(defonce mongo-port     (Integer/parseInt (or (System/getenv "MONGO_PORT") "27017")))
+(defonce mongo-db       (or (System/getenv "MONGO_DB") "pinacolada"))
+(defonce mongo-user     (or (System/getenv "MONGO_USER") "niko"))
+(defonce mongo-password (or (System/getenv "MONGO_PW") ""))
 
 
 ;; Used for building DataSource for Mahout and CRUD

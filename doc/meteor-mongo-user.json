@@ -1,0 +1,36 @@
+{
+  "_id" : "HPkkRN7AgpxzqJJPn",
+  "createdAt" : ISODate("2015-02-13T07:03:45.769Z"),
+  "profile" : {
+    "initialized" : true,
+    "name" : "Nico Ender",
+    "picture" : "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xfp1/v/t1.0-1/c8.0.50.50/p50x50/10408940_784069341627729_2405066460216794546_n.jpg?oh=25d864d14f13558036c42ad20cd856af&oe=558FB3C6&__gda__=1431217634_e256114d5840a9ab09c40e4637675ffe"
+  },
+  "services" : {
+    "facebook" : {
+      "accessToken" : "CAAWmoeJb6JMBAD6EUGLvreKSe4LRyKtsAAfg4YmkJ9CgU7TID1GR0kqkmjTcdhBeCsJO5Msnpa0ls4mDvAg8ZAjULj8f62ZA9zGWjYIZCZCEcReYNEDd1UQye2rpPQ4zwoD1y9uyQnEeR4u72vmUnJzozmpZCvULbT1IbXbkhO78xVjj4rmRjCvDsTzCs01WRFZCdtkf1MFAe3pZAzgaI6N",
+      "email" : "fdtest54@gmail.com",
+      "expiresAt" : 1428995025352,
+      "first_name" : "Nico",
+      "gender" : "male",
+      "id" : "904404262927569",
+      "last_name" : "Ender",
+      "link" : "https://www.facebook.com/app_scoped_user_id/904404262927569/",
+      "locale" : "de_DE",
+      "name" : "Nico Ender"
+    },
+    "resume" : {
+      "loginTokens" : [
+        {
+          "when" : ISODate("2015-02-13T18:02:11.515Z"),
+          "hashedToken" : "nWrbmGLIqdeF5vmQY0RuH07O/nJWfABlsw4W/sMi3cA="
+        }
+      ]
+    }
+  }
+}
+        ;;
+{ "_id" : ObjectId("54cf2fdb0364fac8bb99c088"),
+  "last_name" : "Voltari",
+  "alias" : "wino",
+   "first_name" : "Wino" }
