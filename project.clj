@@ -30,7 +30,8 @@
 
   :plugins [[lein-ring "0.9.0"]]
 
-  :ring {:handler matchbox.handler/app}
+  :ring {:handler matchbox.handler/app
+         :port 3001}
 
   ;; Only required for debugging
   ;; :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]
@@ -39,3 +40,10 @@
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [midje "1.6.3"]
                         [ring-mock "0.1.5"]]}})
+
+  ;;:profiles {:dev        {:jvm-opts ["-Dproperty-file=dev.properties"]
+  ;;                        :ring {:port 8080}}
+  ;;           :ci         {:jvm-opts ["-Dproperty-file=ci.properties"]
+  ;;                        :ring {:port 80}}
+  ;;           :uberjar    {:aot :all
+  ;;                        :ring {:port 80}}})
